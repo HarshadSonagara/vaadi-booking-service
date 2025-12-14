@@ -145,7 +145,7 @@ export const sendPasswordResetEmail = async (
   try {
     const transporter = createTransporter();
 
-    const resetLink = `${frontendUrl}/reset-password?token=${resetToken}`;
+    const resetLink = `${frontendUrl}/auth/reset-password?token=${resetToken}`;
 
     const mailOptions = {
       from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_USER}>`,

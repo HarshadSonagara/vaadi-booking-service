@@ -1,4 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { ResetPasswordToken } from "../models/resetPasswordToken.model.js";
+import { sendPasswordResetEmail } from "../utils/nodemailer.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -59,7 +61,12 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // Send verification email
   try {
-    await sendVerificationEmail(email, fullName, verificationToken, frontendUrl);
+    await sendVerificationEmail(
+      email,
+      fullName,
+      verificationToken,
+      frontendUrl
+    );
   } catch (error) {
     // If email fails, we still created the user, just log the error
     console.error("Failed to send verification email:", error);
@@ -307,6 +314,93 @@ const resendVerificationEmail = asyncHandler(async (req, res) => {
     );
 });
 
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    throw new ApiError(400, "Email is required");
+  }
+
+  const user = await User.findOne({ email });
+
+  if (user) {
+    // Generate valid token
+    const token = crypto.randomBytes(32).toString("hex");
+
+    // Hash token for storage
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    // Save to DB (model handles hashing)
+    await ResetPasswordToken.create({
+      userId: user._id,
+      token: hashedToken,
+    });
+
+    // Send email
+    try {
+      await sendPasswordResetEmail(
+        user.email,
+        user.fullName,
+        token,
+        req.headers.origin || "http://localhost:4200"
+      );
+    } catch (error) {
+      console.error("Failed to send reset email:", error);
+      // We don't throw error to avoid enumerating users, or we can if we want to be explicit
+    }
+  }
+
+  // Always return success to prevent email enumeration
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        {},
+        "If an account with that email exists, we have sent a password reset link."
+      )
+    );
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  if (!token || !newPassword) {
+    throw new ApiError(400, "Token and new password are required");
+  }
+
+  if (newPassword.length < 6) {
+    throw new ApiError(400, "Password must be at least 6 characters");
+  }
+
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  const resetTokenDoc = await ResetPasswordToken.findOne({
+    token: hashedToken,
+    expiresAt: { $gt: Date.now() },
+  });
+
+  if (!resetTokenDoc) {
+    throw new ApiError(400, "Invalid or expired reset token");
+  }
+
+  const user = await User.findById(resetTokenDoc.userId);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  user.password = newPassword;
+  await user.save(); // Will trigger pre-save hash
+
+  // Delete all reset tokens for this user? Or just this one? Just this one.
+  await ResetPasswordToken.deleteMany({ userId: user._id });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password reset successfully"));
+});
+
 export {
   registerUser,
   loginUser,
@@ -315,4 +409,6 @@ export {
   getCurrentUser,
   verifyEmail,
   resendVerificationEmail,
+  forgotPassword,
+  resetPassword,
 };
