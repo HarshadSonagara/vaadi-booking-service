@@ -28,10 +28,15 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
 const registerUser = asyncHandler(async (req, res) => {
   // Get user details from request body
-  const { fullName, email, password, frontendUrl } = req.body;
+  const { fullName, email, mobileNumber, villageName, password, frontendUrl } =
+    req.body;
 
   // Validation - check if fields are not empty
-  if ([fullName, email, password].some((field) => field?.trim() === "")) {
+  if (
+    [fullName, email, mobileNumber, villageName, password].some(
+      (field) => field?.trim() === ""
+    )
+  ) {
     throw new ApiError(400, "All fields are required");
   }
 
@@ -41,18 +46,23 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // Check if user already exists
-  const existedUser = await User.findOne({ email });
+  const existedUser = await User.findOne({
+    $or: [{ email }, { mobileNumber }],
+  });
 
   if (existedUser) {
-    throw new ApiError(409, "User with email already exists");
+    throw new ApiError(409, "User with email or mobile number already exists");
   }
 
   // Create user object - create entry in db
   const user = await User.create({
     fullName,
     email,
+    mobileNumber,
+    villageName,
     password,
     isEmailVerified: false,
+    role: "Admin", // Default role
   });
 
   // Generate email verification token

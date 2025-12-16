@@ -27,6 +27,23 @@ const userSchema = new Schema(
       required: [true, "Password is required"],
       minlength: [6, "Password must be at least 6 characters long"],
     },
+    mobileNumber: {
+      type: String,
+      required: [true, "Mobile number is required"],
+      trim: true,
+      index: true,
+    },
+    villageName: {
+      type: String,
+      required: [true, "Village name is required"],
+      trim: true,
+      index: true,
+    },
+    role: {
+      type: String,
+      enum: ["Admin", "Super Admin"],
+      default: "Admin",
+    },
     isEmailVerified: {
       type: Boolean,
       default: false,
