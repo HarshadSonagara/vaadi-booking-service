@@ -24,8 +24,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 
 // Routes import
 import userRouter from './routes/user.routes.js'
+import villageRouter from './routes/village.routes.js'
 
 // Routes declaration
 app.use("/api/v1/users", userRouter)
+app.use("/api/v1/villages", villageRouter)
 
 export { app }
