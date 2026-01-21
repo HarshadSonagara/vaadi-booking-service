@@ -39,49 +39,80 @@ export const sendVerificationEmail = async (
         <head>
           <style>
             body {
-              font-family: 'Roboto', Arial, sans-serif;
+              font-family: 'Neue Montreal', Arial, sans-serif;
               line-height: 1.6;
-              color: #2c3e50;
-              background-color: #f9f5eb;
+              color: #000000;
+              background-color: #f5f6f5;
+              margin: 0;
+              padding: 20px;
             }
             .container {
               max-width: 600px;
               margin: 0 auto;
-              padding: 20px;
               background-color: #ffffff;
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             }
             .header {
-              background-color: #c06037;
+              background-color: #9747ff;
               color: white;
-              padding: 30px 20px;
+              padding: 40px 20px;
               text-align: center;
-              border-radius: 5px 5px 0 0;
+            }
+            .header h1 {
+              margin: 0;
+              font-size: 24px;
+              font-weight: 700;
             }
             .content {
-              background-color: #f9f5eb;
-              padding: 30px;
-              border-radius: 0 0 5px 5px;
+              background-color: #ffffff;
+              padding: 40px 30px;
+            }
+            .content h2 {
+              color: #000000;
+              margin-top: 0;
+              margin-bottom: 20px;
+            }
+            .content p {
+              color: #333333;
+              margin-bottom: 15px;
             }
             .button {
               display: inline-block;
-              padding: 14px 35px;
-              margin: 20px 0;
-              background-color: #c06037;
+              padding: 16px 40px;
+              margin: 25px 0;
+              background-color: #9747ff;
               color: white !important;
               text-decoration: none;
               border-radius: 30px;
               font-weight: bold;
-              transition: background-color 0.2s;
+              font-size: 16px;
             }
-            .button:hover {
-              background-color: #a84f2d;
+            .link-box {
+              background-color: #f5f6f5;
+              padding: 15px;
+              border-radius: 8px;
+              margin: 20px 0;
+              border-left: 4px solid #9747ff;
+            }
+            .link-box a {
+              color: #9747ff;
+              text-decoration: none;
+              word-break: break-all;
+              font-weight: 500;
+            }
+            .warning {
+              color: #ff0000;
+              font-weight: bold;
+              margin-top: 20px;
             }
             .footer {
-              margin-top: 20px;
+              margin-top: 30px;
               padding-top: 20px;
               border-top: 1px solid #e0e0e0;
-              font-size: 12px;
-              color: #7f8c8d;
+              font-size: 13px;
+              color: #a3a4a9;
             }
           </style>
         </head>
@@ -98,11 +129,13 @@ export const sendVerificationEmail = async (
                 <a href="${verificationLink}" class="button">Verify Email</a>
               </center>
               <p>Or copy and paste this link in your browser:</p>
-              <p style="word-break: break-all; color: #e67e22;">${verificationLink}</p>
-              <p style="color: #e74c3c;"><strong>This link will expire in 24 hours.</strong></p>
+              <div class="link-box">
+                <a href="${verificationLink}">${verificationLink}</a>
+              </div>
+              <p class="warning">This link will expire in 24 hours.</p>
               <p>If you didn't create an account, please ignore this email.</p>
               <div class="footer">
-                <p>Best regards,<br>Community Vaadi Booking Team</p>
+                <p>Best regards,<br><strong>Community Vaadi Booking Team</strong></p>
               </div>
             </div>
           </div>
@@ -157,49 +190,80 @@ export const sendPasswordResetEmail = async (
         <head>
           <style>
             body {
-              font-family: 'Roboto', Arial, sans-serif;
+              font-family: 'Neue Montreal', Arial, sans-serif;
               line-height: 1.6;
-              color: #2c3e50;
-              background-color: #f9f5eb;
+              color: #000000;
+              background-color: #f5f6f5;
+              margin: 0;
+              padding: 20px;
             }
             .container {
               max-width: 600px;
               margin: 0 auto;
-              padding: 20px;
               background-color: #ffffff;
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             }
             .header {
-              background-color: #e74c3c;
+              background-color: #9747ff;
               color: white;
-              padding: 30px 20px;
+              padding: 40px 20px;
               text-align: center;
-              border-radius: 5px 5px 0 0;
+            }
+            .header h1 {
+              margin: 0;
+              font-size: 24px;
+              font-weight: 700;
             }
             .content {
-              background-color: #f9f5eb;
-              padding: 30px;
-              border-radius: 0 0 5px 5px;
+              background-color: #ffffff;
+              padding: 40px 30px;
+            }
+            .content h2 {
+              color: #000000;
+              margin-top: 0;
+              margin-bottom: 20px;
+            }
+            .content p {
+              color: #333333;
+              margin-bottom: 15px;
             }
             .button {
               display: inline-block;
-              padding: 14px 35px;
-              margin: 20px 0;
-              background-color: #e74c3c;
-              color: white;
+              padding: 16px 40px;
+              margin: 25px 0;
+              background-color: #9747ff;
+              color: white !important;
               text-decoration: none;
               border-radius: 30px;
               font-weight: bold;
-              transition: background-color 0.2s;
+              font-size: 16px;
             }
-            .button:hover {
-              background-color: #c0392b;
+            .link-box {
+              background-color: #f5f6f5;
+              padding: 15px;
+              border-radius: 8px;
+              margin: 20px 0;
+              border-left: 4px solid #9747ff;
+            }
+            .link-box a {
+              color: #9747ff;
+              text-decoration: none;
+              word-break: break-all;
+              font-weight: 500;
+            }
+            .warning {
+              color: #ff0000;
+              font-weight: bold;
+              margin-top: 20px;
             }
             .footer {
-              margin-top: 20px;
+              margin-top: 30px;
               padding-top: 20px;
               border-top: 1px solid #e0e0e0;
-              font-size: 12px;
-              color: #7f8c8d;
+              font-size: 13px;
+              color: #a3a4a9;
             }
           </style>
         </head>
@@ -216,11 +280,13 @@ export const sendPasswordResetEmail = async (
                 <a href="${resetLink}" class="button">Reset Password</a>
               </center>
               <p>Or copy and paste this link in your browser:</p>
-              <p style="word-break: break-all; color: #e67e22;">${resetLink}</p>
-              <p style="color: #e74c3c;"><strong>This link will expire in 1 hour.</strong></p>
+              <div class="link-box">
+                <a href="${resetLink}">${resetLink}</a>
+              </div>
+              <p class="warning">This link will expire in 1 hour.</p>
               <p>If you didn't request a password reset, please ignore this email or contact support if you have concerns.</p>
               <div class="footer">
-                <p>Best regards,<br>Community Vaadi Booking Team</p>
+                <p>Best regards,<br><strong>Community Vaadi Booking Team</strong></p>
               </div>
             </div>
           </div>
