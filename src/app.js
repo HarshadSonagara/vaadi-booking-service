@@ -3,6 +3,7 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import swaggerUi from "swagger-ui-express"
 import swaggerSpec from "./swagger.js"
+import { errorHandler } from "./middlewares/error.middleware.js"
 
 const app = express()
 
@@ -29,5 +30,8 @@ import villageRouter from './routes/village.routes.js'
 // Routes declaration
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/villages", villageRouter)
+
+// Global error handler - MUST be after all routes
+app.use(errorHandler)
 
 export { app }

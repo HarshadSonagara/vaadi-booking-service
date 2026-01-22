@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ResetPasswordToken } from "../models/resetPasswordToken.model.js";
-import { sendPasswordResetEmail } from "../utils/nodemailer.js";
+import { sendPasswordResetEmail, sendAccountCreatedEmail } from "../utils/nodemailer.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -130,6 +130,11 @@ const loginUser = asyncHandler(async (req, res) => {
 
   if (!isPasswordValid) {
     throw new ApiError(401, "Invalid user credentials");
+  }
+
+  // Check if email is verified
+  if (!user.isEmailVerified) {
+    throw new ApiError(403, "Please verify your email before logging in. Check your inbox for the verification link.");
   }
 
   // Update last login time
@@ -411,6 +416,264 @@ const resetPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password reset successfully"));
 });
 
+// ==================== USER MANAGEMENT (Super Admin Only) ====================
+
+/**
+ * Get all users with pagination and search
+ * Super Admin only
+ */
+const getAllUsers = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 10, search = "" } = req.query;
+
+  const pageNum = parseInt(page, 10);
+  const limitNum = parseInt(limit, 10);
+  const skip = (pageNum - 1) * limitNum;
+
+  // Build search query
+  const searchQuery = search
+    ? {
+        $or: [
+          { fullName: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } },
+          { mobileNumber: { $regex: search, $options: "i" } },
+          { villageName: { $regex: search, $options: "i" } },
+        ],
+      }
+    : {};
+
+  // Get total count for pagination
+  const total = await User.countDocuments(searchQuery);
+
+  // Get users with pagination (exclude sensitive fields)
+  const users = await User.find(searchQuery)
+    .select("-password -refreshToken -emailVerificationToken -emailVerificationExpiry")
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limitNum);
+
+  const totalPages = Math.ceil(total / limitNum);
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        users,
+        pagination: {
+          page: pageNum,
+          limit: limitNum,
+          total,
+          totalPages,
+        },
+      },
+      "Users fetched successfully"
+    )
+  );
+});
+
+/**
+ * Get user by ID
+ * Super Admin only
+ */
+const getUserById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    throw new ApiError(400, "User ID is required");
+  }
+
+  const user = await User.findById(id).select(
+    "-password -refreshToken -emailVerificationToken -emailVerificationExpiry"
+  );
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User fetched successfully"));
+});
+
+/**
+ * Create a new user (Admin creation by Super Admin)
+ * Super Admin only
+ */
+const createUserAdmin = asyncHandler(async (req, res) => {
+  const { fullName, email, mobileNumber, villageName, password, role = "Admin", frontendUrl } = req.body;
+
+  // Validation
+  if ([fullName, email, mobileNumber, villageName, password].some((field) => field?.trim() === "")) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  // Validate role
+  if (!["Admin", "Super Admin"].includes(role)) {
+    throw new ApiError(400, "Invalid role. Must be 'Admin' or 'Super Admin'");
+  }
+
+  // Check if user already exists
+  const existedUser = await User.findOne({
+    $or: [{ email }, { mobileNumber }],
+  });
+
+  if (existedUser) {
+    throw new ApiError(409, "User with this email or mobile number already exists");
+  }
+
+  // Create user (email is pre-verified since Super Admin is creating)
+  const user = await User.create({
+    fullName,
+    email,
+    mobileNumber,
+    villageName,
+    password,
+    role,
+    isEmailVerified: true, // Pre-verified since Super Admin creates
+  });
+
+  const createdUser = await User.findById(user._id).select(
+    "-password -refreshToken -emailVerificationToken -emailVerificationExpiry"
+  );
+
+  if (!createdUser) {
+    throw new ApiError(500, "Something went wrong while creating the user");
+  }
+
+  // Send account created email with credentials
+  try {
+    const emailFrontendUrl = frontendUrl || req.headers.origin || "http://localhost:4200";
+    await sendAccountCreatedEmail(
+      email,
+      fullName,
+      password, // Send the plain password before it gets hashed
+      role,
+      villageName,
+      emailFrontendUrl
+    );
+  } catch (error) {
+    // Log error but don't fail the request - user is already created
+    console.error("Failed to send account created email:", error);
+  }
+
+  return res
+    .status(201)
+    .json(new ApiResponse(201, createdUser, "User created successfully. Login credentials sent to email."));
+});
+
+/**
+ * Update user details
+ * Super Admin only
+ */
+const updateUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { fullName, email, mobileNumber, villageName, role } = req.body;
+
+  if (!id) {
+    throw new ApiError(400, "User ID is required");
+  }
+
+  // Check if user exists
+  const existingUser = await User.findById(id);
+  if (!existingUser) {
+    throw new ApiError(404, "User not found");
+  }
+
+  // Check for duplicate email/mobile (excluding current user)
+  if (email || mobileNumber) {
+    const duplicateUser = await User.findOne({
+      _id: { $ne: id },
+      $or: [
+        ...(email ? [{ email }] : []),
+        ...(mobileNumber ? [{ mobileNumber }] : []),
+      ],
+    });
+
+    if (duplicateUser) {
+      throw new ApiError(409, "User with this email or mobile number already exists");
+    }
+  }
+
+  // Validate role if provided
+  if (role && !["Admin", "Super Admin"].includes(role)) {
+    throw new ApiError(400, "Invalid role. Must be 'Admin' or 'Super Admin'");
+  }
+
+  // Build update object
+  const updateData = {};
+  if (fullName) updateData.fullName = fullName;
+  if (email) updateData.email = email;
+  if (mobileNumber) updateData.mobileNumber = mobileNumber;
+  if (villageName) updateData.villageName = villageName;
+  if (role) updateData.role = role;
+
+  const user = await User.findByIdAndUpdate(
+    id,
+    { $set: updateData },
+    { new: true }
+  ).select("-password -refreshToken -emailVerificationToken -emailVerificationExpiry");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User updated successfully"));
+});
+
+/**
+ * Delete user
+ * Super Admin only
+ */
+const deleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    throw new ApiError(400, "User ID is required");
+  }
+
+  // Prevent deleting self
+  if (req.user._id.toString() === id) {
+    throw new ApiError(400, "You cannot delete your own account");
+  }
+
+  const user = await User.findByIdAndDelete(id);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "User deleted successfully"));
+});
+
+/**
+ * Reset user password (Super Admin only)
+ * Super Admin can reset any user's password
+ */
+const resetUserPasswordAdmin = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { newPassword } = req.body;
+
+  if (!id) {
+    throw new ApiError(400, "User ID is required");
+  }
+
+  if (!newPassword || newPassword.length < 6) {
+    throw new ApiError(400, "Password must be at least 6 characters");
+  }
+
+  const user = await User.findById(id);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  user.password = newPassword;
+  await user.save(); // Will trigger pre-save hash
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password reset successfully"));
+});
+
 export {
   registerUser,
   loginUser,
@@ -421,4 +684,12 @@ export {
   resendVerificationEmail,
   forgotPassword,
   resetPassword,
+  // User management (Super Admin only)
+  getAllUsers,
+  getUserById,
+  createUserAdmin,
+  updateUser,
+  deleteUser,
+  resetUserPasswordAdmin,
 };
+

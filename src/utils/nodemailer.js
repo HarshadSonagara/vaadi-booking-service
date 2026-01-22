@@ -318,3 +318,161 @@ export const sendPasswordResetEmail = async (
     throw error;
   }
 };
+
+// Send account created email (when Super Admin creates a user)
+export const sendAccountCreatedEmail = async (
+  email,
+  fullName,
+  password,
+  role,
+  villageName,
+  frontendUrl
+) => {
+  try {
+    const transporter = createTransporter();
+
+    const loginLink = `${frontendUrl}/auth/login`;
+
+    const mailOptions = {
+      from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Your Account Has Been Created - Community Vaadi Booking",
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body {
+              font-family: 'Neue Montreal', Arial, sans-serif;
+              line-height: 1.6;
+              color: #000000;
+              background-color: #f5f6f5;
+              margin: 0;
+              padding: 20px;
+            }
+            .container {
+              max-width: 600px;
+              margin: 0 auto;
+              background-color: #ffffff;
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+            .header {
+              background-color: #9747ff;
+              color: white;
+              padding: 40px 20px;
+              text-align: center;
+            }
+            .header h1 {
+              margin: 0;
+              font-size: 24px;
+              font-weight: 700;
+            }
+            .content {
+              background-color: #ffffff;
+              padding: 40px 30px;
+            }
+            .content h2 {
+              color: #000000;
+              margin-top: 0;
+              margin-bottom: 20px;
+            }
+            .content p {
+              color: #333333;
+              margin-bottom: 15px;
+            }
+            .credentials-box {
+              background-color: #f5f6f5;
+              padding: 20px;
+              border-radius: 8px;
+              margin: 20px 0;
+              border-left: 4px solid #9747ff;
+            }
+            .credentials-box p {
+              margin: 8px 0;
+            }
+            .credentials-box strong {
+              color: #9747ff;
+            }
+            .button {
+              display: inline-block;
+              padding: 16px 40px;
+              margin: 25px 0;
+              background-color: #9747ff;
+              color: white !important;
+              text-decoration: none;
+              border-radius: 30px;
+              font-weight: bold;
+              font-size: 16px;
+            }
+            .warning {
+              color: #ff0000;
+              font-weight: bold;
+              margin-top: 20px;
+            }
+            .footer {
+              margin-top: 30px;
+              padding-top: 20px;
+              border-top: 1px solid #e0e0e0;
+              font-size: 13px;
+              color: #a3a4a9;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Welcome to Community Vaadi Booking!</h1>
+            </div>
+            <div class="content">
+              <h2>Hello ${fullName}!</h2>
+              <p>Your account has been successfully created by the administrator.</p>
+              <p>Here are your login credentials:</p>
+              <div class="credentials-box">
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Password:</strong> ${password}</p>
+                <p><strong>Role:</strong> ${role}</p>
+                <p><strong>Village:</strong> ${villageName}</p>
+              </div>
+              <center>
+                <a href="${loginLink}" class="button">Login Now</a>
+              </center>
+              <p class="warning">Please change your password after your first login for security.</p>
+              <div class="footer">
+                <p>Best regards,<br><strong>Community Vaadi Booking Team</strong></p>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+      text: `
+        Hello ${fullName}!
+
+        Your account has been successfully created by the administrator.
+
+        Here are your login credentials:
+        Email: ${email}
+        Password: ${password}
+        Role: ${role}
+        Village: ${villageName}
+
+        Login here: ${loginLink}
+
+        Please change your password after your first login for security.
+
+        Best regards,
+        Community Vaadi Booking Team
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Account created email sent: %s", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error sending account created email:", error);
+    throw error;
+  }
+};
+
