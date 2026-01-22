@@ -26,10 +26,12 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 // Routes import
 import userRouter from './routes/user.routes.js'
 import villageRouter from './routes/village.routes.js'
+import hallRouter from './routes/hall.routes.js'
 
 // Routes declaration
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/villages", villageRouter)
+app.use("/api/v1/halls", hallRouter)
 
 // Global error handler - MUST be after all routes
 app.use(errorHandler)
