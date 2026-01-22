@@ -448,9 +448,9 @@ const getCalendarData = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid year or month");
   }
 
-  // Get start and end of the month
-  const startDate = new Date(yearNum, monthNum - 1, 1);
-  const endDate = new Date(yearNum, monthNum, 0, 23, 59, 59, 999);
+  // Get start and end of the month in UTC to match MongoDB date storage
+  const startDate = new Date(Date.UTC(yearNum, monthNum - 1, 1, 0, 0, 0, 0));
+  const endDate = new Date(Date.UTC(yearNum, monthNum, 0, 23, 59, 59, 999));
 
   // Get halls first and assign colors to those without
   const hallQuery = {
@@ -528,14 +528,10 @@ const getCalendarData = asyncHandler(async (req, res) => {
 
   let bookingQuery = {
     isCancelled: { $ne: true },
-    $or: [
-      { fromDate: { $gte: startDate, $lte: endDate } },
-      { toDate: { $gte: startDate, $lte: endDate } },
-      { fromDate: { $lte: startDate }, toDate: { $gte: endDate } },
-    ],
+    fromDate: { $lte: endDate },
+    toDate: { $gte: startDate },
   };
 
-  // Filter by village if selectedVillageName is set
   if (selectedVillageName) {
     bookingQuery.villageName = selectedVillageName;
   } else if (!isSuperAdmin(req.user)) {
