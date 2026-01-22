@@ -139,4 +139,19 @@ const deleteVillage = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Village deleted successfully"));
 });
 
-export { createVillage, getAllVillages, updateVillage, deleteVillage };
+// Public endpoint - get all villages for dropdown (no auth required)
+const getVillagesPublic = asyncHandler(async (req, res) => {
+  const villages = await Village.find({})
+    .select("_id name")
+    .sort({ name: 1 });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      villages,
+      "Villages fetched successfully"
+    )
+  );
+});
+
+export { createVillage, getAllVillages, updateVillage, deleteVillage, getVillagesPublic };
