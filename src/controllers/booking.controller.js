@@ -378,6 +378,155 @@ const getAvailableHalls = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, halls, "Available halls fetched successfully"));
 });
 
+// Color palette for calendar
+const CALENDAR_HALL_COLORS = [
+  "#9747ff", // Purple (primary)
+  "#27ae60", // Green
+  "#3498db", // Blue
+  "#e74c3c", // Red
+  "#f39c12", // Orange
+  "#1abc9c", // Teal
+  "#9b59b6", // Violet
+  "#34495e", // Dark gray-blue
+  "#e91e63", // Pink
+  "#00bcd4", // Cyan
+];
+
+/**
+ * Get calendar data for a specific month
+ * Returns bookings with hall colors for calendar display
+ */
+const getCalendarData = asyncHandler(async (req, res) => {
+  const { year, month } = req.query;
+
+  if (!year || !month) {
+    throw new ApiError(400, "Year and month are required");
+  }
+
+  const yearNum = parseInt(year);
+  const monthNum = parseInt(month);
+
+  if (isNaN(yearNum) || isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
+    throw new ApiError(400, "Invalid year or month");
+  }
+
+  // Get start and end of the month
+  const startDate = new Date(yearNum, monthNum - 1, 1);
+  const endDate = new Date(yearNum, monthNum, 0, 23, 59, 59, 999);
+
+  // Get halls first and assign colors to those without
+  const hallQuery = {
+    status: "Active",
+  };
+
+  if (!isSuperAdmin(req.user)) {
+    hallQuery.villageName = req.user.villageName;
+  }
+
+  const halls = await Hall.find(hallQuery)
+    .select("_id name color villageName")
+    .sort({ name: 1 });
+
+  // Group halls by village to assign colors per village
+  const hallsByVillage = {};
+  for (const hall of halls) {
+    if (!hallsByVillage[hall.villageName]) {
+      hallsByVillage[hall.villageName] = [];
+    }
+    hallsByVillage[hall.villageName].push(hall);
+  }
+
+  // Assign colors to halls without colors and save them
+  const hallsToUpdate = [];
+  const hallColorMap = {}; // Map of hallId to color
+
+  for (const villageName in hallsByVillage) {
+    const villageHalls = hallsByVillage[villageName];
+    const usedColors = villageHalls.map((h) => h.color).filter(Boolean);
+
+    for (const hall of villageHalls) {
+      if (!hall.color) {
+        // Find first unused color
+        let assignedColor = null;
+        for (const color of CALENDAR_HALL_COLORS) {
+          if (!usedColors.includes(color)) {
+            assignedColor = color;
+            usedColors.push(color);
+            break;
+          }
+        }
+        // If all colors used, generate random
+        if (!assignedColor) {
+          assignedColor = "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0");
+        }
+        hall.color = assignedColor;
+        hallsToUpdate.push({ id: hall._id, color: assignedColor });
+      }
+      hallColorMap[hall._id.toString()] = hall.color;
+    }
+  }
+
+  // Save updated colors to database
+  if (hallsToUpdate.length > 0) {
+    await Promise.all(
+      hallsToUpdate.map((h) => Hall.findByIdAndUpdate(h.id, { color: h.color }))
+    );
+  }
+
+  // Build booking query based on role
+  let bookingQuery = {
+    isCancelled: { $ne: true },
+    $or: [
+      // Booking starts within the month
+      { fromDate: { $gte: startDate, $lte: endDate } },
+      // Booking ends within the month
+      { toDate: { $gte: startDate, $lte: endDate } },
+      // Booking spans the entire month
+      { fromDate: { $lte: startDate }, toDate: { $gte: endDate } },
+    ],
+  };
+
+  // Admin can only see bookings from their village
+  if (!isSuperAdmin(req.user)) {
+    bookingQuery.villageName = req.user.villageName;
+  }
+
+  const bookings = await Booking.find(bookingQuery)
+    .populate("hallId", "name color")
+    .sort({ fromDate: 1 });
+
+  // Transform bookings for calendar display using the color map
+  const calendarBookings = bookings.map((booking) => {
+    const hallId = booking.hallId?._id?.toString() || booking.hallId?.toString();
+    return {
+      _id: booking._id,
+      hallId: booking.hallId?._id || booking.hallId,
+      hallName: booking.hallId?.name || booking.hallName,
+      hallColor: hallColorMap[hallId] || booking.hallId?.color || "#9747ff",
+      villagerName: booking.villagerName,
+      bookingReason: booking.bookingReason,
+      fromDate: booking.fromDate,
+      toDate: booking.toDate,
+      totalDays: booking.totalDays,
+    };
+  });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        bookings: calendarBookings,
+        halls: halls.map((h) => ({
+          _id: h._id,
+          name: h.name,
+          color: h.color,
+        })),
+      },
+      "Calendar data fetched successfully"
+    )
+  );
+});
+
 export {
   getAllBookings,
   getBookingById,
@@ -385,4 +534,5 @@ export {
   updateBooking,
   cancelBooking,
   getAvailableHalls,
+  getCalendarData,
 };

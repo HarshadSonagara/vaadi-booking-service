@@ -4,6 +4,38 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Hall } from "../models/hall.model.js";
 import { isSuperAdmin } from "../middlewares/role.middleware.js";
 
+// Color palette for halls (10 distinct colors)
+const HALL_COLORS = [
+  "#9747ff", // Purple (primary)
+  "#27ae60", // Green
+  "#3498db", // Blue
+  "#e74c3c", // Red
+  "#f39c12", // Orange
+  "#1abc9c", // Teal
+  "#9b59b6", // Violet
+  "#34495e", // Dark gray-blue
+  "#e91e63", // Pink
+  "#00bcd4", // Cyan
+];
+
+/**
+ * Get next available color for a hall in a village
+ */
+const getNextAvailableColor = async (villageName) => {
+  const halls = await Hall.find({ villageName }).select("color");
+  const usedColors = halls.map((h) => h.color).filter(Boolean);
+
+  // Find first unused color from palette
+  for (const color of HALL_COLORS) {
+    if (!usedColors.includes(color)) {
+      return color;
+    }
+  }
+
+  // If all colors used, generate a random one
+  return "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0");
+};
+
 /**
  * Get all halls (with role-based filtering)
  * Admin: Only halls from their village
@@ -111,11 +143,15 @@ const createHall = asyncHandler(async (req, res) => {
     throw new ApiError(409, "A hall with this name already exists in your village");
   }
 
+  // Get next available color for this village
+  const color = await getNextAvailableColor(req.user.villageName);
+
   // Create hall with village from logged-in user
   const hall = await Hall.create({
     name: name.trim(),
     status,
     villageName: req.user.villageName, // Auto-assign from user context
+    color, // Auto-assign color
   });
 
   return res

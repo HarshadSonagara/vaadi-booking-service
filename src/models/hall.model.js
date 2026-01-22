@@ -19,6 +19,11 @@ const hallSchema = new Schema(
       trim: true,
       index: true,
     },
+    color: {
+      type: String,
+      trim: true,
+      default: null,
+    },
   },
   {
     timestamps: true,
