@@ -10,12 +10,10 @@ const createVillage = asyncHandler(async (req, res) => {
     throw new ApiError(400, "All fields are required");
   }
 
-  const existedVillage = await Village.findOne({
-    $or: [{ name }, { pincode }],
-  });
+  const existedVillage = await Village.findOne({ name });
 
   if (existedVillage) {
-    throw new ApiError(409, "Village with this name or pincode already exists");
+    throw new ApiError(409, "Village with this name already exists");
   }
 
   const village = await Village.create({
@@ -35,10 +33,50 @@ const createVillage = asyncHandler(async (req, res) => {
 });
 
 const getAllVillages = asyncHandler(async (req, res) => {
-  const villages = await Village.find({});
-  return res
-    .status(200)
-    .json(new ApiResponse(200, villages, "Villages fetched successfully"));
+  const { page = 1, limit = 10, search = "" } = req.query;
+
+  const pageNum = parseInt(page, 10);
+  const limitNum = parseInt(limit, 10);
+  const skip = (pageNum - 1) * limitNum;
+
+  // Build search query
+  const searchQuery = search
+    ? {
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { state: { $regex: search, $options: "i" } },
+          { country: { $regex: search, $options: "i" } },
+          { pincode: { $regex: search, $options: "i" } },
+        ],
+      }
+    : {};
+
+  // Get total count for pagination
+  const total = await Village.countDocuments(searchQuery);
+
+  // Get villages with pagination
+  const villages = await Village.find(searchQuery)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limitNum);
+
+  const totalPages = Math.ceil(total / limitNum);
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        villages,
+        pagination: {
+          page: pageNum,
+          limit: limitNum,
+          total,
+          totalPages,
+        },
+      },
+      "Villages fetched successfully"
+    )
+  );
 });
 
 const updateVillage = asyncHandler(async (req, res) => {
@@ -47,6 +85,22 @@ const updateVillage = asyncHandler(async (req, res) => {
 
   if (!id) {
     throw new ApiError(400, "Village ID is required");
+  }
+
+  // Check if village exists
+  const existingVillage = await Village.findById(id);
+  if (!existingVillage) {
+    throw new ApiError(404, "Village not found");
+  }
+
+  // Check for duplicate name (excluding current village)
+  const duplicateVillage = await Village.findOne({
+    _id: { $ne: id },
+    name,
+  });
+
+  if (duplicateVillage) {
+    throw new ApiError(409, "Village with this name already exists");
   }
 
   const village = await Village.findByIdAndUpdate(
@@ -61,10 +115,6 @@ const updateVillage = asyncHandler(async (req, res) => {
     },
     { new: true }
   );
-
-  if (!village) {
-    throw new ApiError(404, "Village not found");
-  }
 
   return res
     .status(200)
