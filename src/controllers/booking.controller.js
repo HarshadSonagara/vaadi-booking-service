@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Booking } from "../models/booking.model.js";
 import { Hall } from "../models/hall.model.js";
+import { Village } from "../models/village.model.js";
 import { isSuperAdmin } from "../middlewares/role.middleware.js";
 
 /**
@@ -19,17 +20,31 @@ const calculateTotalDays = (fromDate, toDate) => {
 /**
  * Check if booking dates overlap with existing bookings
  */
-const checkOverlap = async (hallId, fromDate, toDate, excludeBookingId = null) => {
+const checkOverlap = async (
+  hallId,
+  fromDate,
+  toDate,
+  excludeBookingId = null
+) => {
   const query = {
     hallId,
     isCancelled: { $ne: true },
     $or: [
       // New booking starts during existing booking
-      { fromDate: { $lte: new Date(fromDate) }, toDate: { $gte: new Date(fromDate) } },
+      {
+        fromDate: { $lte: new Date(fromDate) },
+        toDate: { $gte: new Date(fromDate) },
+      },
       // New booking ends during existing booking
-      { fromDate: { $lte: new Date(toDate) }, toDate: { $gte: new Date(toDate) } },
+      {
+        fromDate: { $lte: new Date(toDate) },
+        toDate: { $gte: new Date(toDate) },
+      },
       // New booking encompasses existing booking
-      { fromDate: { $gte: new Date(fromDate) }, toDate: { $lte: new Date(toDate) } },
+      {
+        fromDate: { $gte: new Date(fromDate) },
+        toDate: { $lte: new Date(toDate) },
+      },
     ],
   };
 
@@ -111,10 +126,15 @@ const getBookingById = asyncHandler(async (req, res) => {
 
   // Admin can only view bookings from their village
   if (!isSuperAdmin(req.user) && booking.villageName !== req.user.villageName) {
-    throw new ApiError(403, "Access denied - You can only view bookings from your village");
+    throw new ApiError(
+      403,
+      "Access denied - You can only view bookings from your village"
+    );
   }
 
-  return res.status(200).json(new ApiResponse(200, booking, "Booking fetched successfully"));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, booking, "Booking fetched successfully"));
 });
 
 /**
@@ -178,7 +198,9 @@ const createBooking = asyncHandler(async (req, res) => {
   // Check for overlapping bookings
   const overlappingBooking = await checkOverlap(hallId, fromDate, toDate);
   if (overlappingBooking) {
-    const overlapFrom = new Date(overlappingBooking.fromDate).toLocaleDateString();
+    const overlapFrom = new Date(
+      overlappingBooking.fromDate
+    ).toLocaleDateString();
     const overlapTo = new Date(overlappingBooking.toDate).toLocaleDateString();
     throw new ApiError(
       409,
@@ -204,7 +226,10 @@ const createBooking = asyncHandler(async (req, res) => {
     createdBy: req.user._id,
   });
 
-  const createdBooking = await Booking.findById(booking._id).populate("createdBy", "fullName");
+  const createdBooking = await Booking.findById(booking._id).populate(
+    "createdBy",
+    "fullName"
+  );
 
   return res
     .status(201)
@@ -238,7 +263,10 @@ const updateBooking = asyncHandler(async (req, res) => {
 
   // Admin can only update bookings from their village
   if (!isSuperAdmin(req.user) && booking.villageName !== req.user.villageName) {
-    throw new ApiError(403, "Access denied - You can only update bookings from your village");
+    throw new ApiError(
+      403,
+      "Access denied - You can only update bookings from your village"
+    );
   }
 
   // Build update object
@@ -293,7 +321,10 @@ const updateBooking = asyncHandler(async (req, res) => {
       if (hall.status !== "Active") {
         throw new ApiError(400, "Cannot book an inactive hall");
       }
-      if (!isSuperAdmin(req.user) && hall.villageName !== req.user.villageName) {
+      if (
+        !isSuperAdmin(req.user) &&
+        hall.villageName !== req.user.villageName
+      ) {
         throw new ApiError(403, "You can only book halls from your village");
       }
       updateData.hallId = hallId;
@@ -301,10 +332,19 @@ const updateBooking = asyncHandler(async (req, res) => {
     }
 
     // Check for overlapping bookings
-    const overlappingBooking = await checkOverlap(newHallId, newFromDate, newToDate, id);
+    const overlappingBooking = await checkOverlap(
+      newHallId,
+      newFromDate,
+      newToDate,
+      id
+    );
     if (overlappingBooking) {
-      const overlapFrom = new Date(overlappingBooking.fromDate).toLocaleDateString();
-      const overlapTo = new Date(overlappingBooking.toDate).toLocaleDateString();
+      const overlapFrom = new Date(
+        overlappingBooking.fromDate
+      ).toLocaleDateString();
+      const overlapTo = new Date(
+        overlappingBooking.toDate
+      ).toLocaleDateString();
       throw new ApiError(
         409,
         `This hall is already booked from ${overlapFrom} to ${overlapTo}. Please select different dates.`
@@ -348,7 +388,10 @@ const cancelBooking = asyncHandler(async (req, res) => {
 
   // Admin can only cancel bookings from their village
   if (!isSuperAdmin(req.user) && booking.villageName !== req.user.villageName) {
-    throw new ApiError(403, "Access denied - You can only cancel bookings from your village");
+    throw new ApiError(
+      403,
+      "Access denied - You can only cancel bookings from your village"
+    );
   }
 
   const cancelledBooking = await Booking.findByIdAndUpdate(
@@ -359,12 +402,11 @@ const cancelBooking = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, cancelledBooking, "Booking cancelled successfully"));
+    .json(
+      new ApiResponse(200, cancelledBooking, "Booking cancelled successfully")
+    );
 });
 
-/**
- * Get available halls for booking (Active halls from user's village)
- */
 const getAvailableHalls = asyncHandler(async (req, res) => {
   const query = {
     status: "Active",
@@ -392,12 +434,8 @@ const CALENDAR_HALL_COLORS = [
   "#00bcd4", // Cyan
 ];
 
-/**
- * Get calendar data for a specific month
- * Returns bookings with hall colors for calendar display
- */
 const getCalendarData = asyncHandler(async (req, res) => {
-  const { year, month } = req.query;
+  const { year, month, villageId } = req.query;
 
   if (!year || !month) {
     throw new ApiError(400, "Year and month are required");
@@ -419,15 +457,27 @@ const getCalendarData = asyncHandler(async (req, res) => {
     status: "Active",
   };
 
-  if (!isSuperAdmin(req.user)) {
+  let selectedVillageName = null;
+
+  if (villageId) {
+    if (!villageId.match(/^[0-9a-fA-F]{24}$/)) {
+      throw new ApiError(400, "Invalid village ID");
+    }
+    const village = await Village.findById(villageId);
+    if (!village) {
+      throw new ApiError(404, "Village not found");
+    }
+    selectedVillageName = village.name;
+    hallQuery.villageName = selectedVillageName;
+  } else if (!isSuperAdmin(req.user)) {
     hallQuery.villageName = req.user.villageName;
+    selectedVillageName = req.user.villageName;
   }
 
   const halls = await Hall.find(hallQuery)
     .select("_id name color villageName")
     .sort({ name: 1 });
 
-  // Group halls by village to assign colors per village
   const hallsByVillage = {};
   for (const hall of halls) {
     if (!hallsByVillage[hall.villageName]) {
@@ -436,7 +486,6 @@ const getCalendarData = asyncHandler(async (req, res) => {
     hallsByVillage[hall.villageName].push(hall);
   }
 
-  // Assign colors to halls without colors and save them
   const hallsToUpdate = [];
   const hallColorMap = {}; // Map of hallId to color
 
@@ -457,7 +506,11 @@ const getCalendarData = asyncHandler(async (req, res) => {
         }
         // If all colors used, generate random
         if (!assignedColor) {
-          assignedColor = "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0");
+          assignedColor =
+            "#" +
+            Math.floor(Math.random() * 16777215)
+              .toString(16)
+              .padStart(6, "0");
         }
         hall.color = assignedColor;
         hallsToUpdate.push({ id: hall._id, color: assignedColor });
@@ -473,21 +526,19 @@ const getCalendarData = asyncHandler(async (req, res) => {
     );
   }
 
-  // Build booking query based on role
   let bookingQuery = {
     isCancelled: { $ne: true },
     $or: [
-      // Booking starts within the month
       { fromDate: { $gte: startDate, $lte: endDate } },
-      // Booking ends within the month
       { toDate: { $gte: startDate, $lte: endDate } },
-      // Booking spans the entire month
       { fromDate: { $lte: startDate }, toDate: { $gte: endDate } },
     ],
   };
 
-  // Admin can only see bookings from their village
-  if (!isSuperAdmin(req.user)) {
+  // Filter by village if selectedVillageName is set
+  if (selectedVillageName) {
+    bookingQuery.villageName = selectedVillageName;
+  } else if (!isSuperAdmin(req.user)) {
     bookingQuery.villageName = req.user.villageName;
   }
 
@@ -495,9 +546,9 @@ const getCalendarData = asyncHandler(async (req, res) => {
     .populate("hallId", "name color")
     .sort({ fromDate: 1 });
 
-  // Transform bookings for calendar display using the color map
   const calendarBookings = bookings.map((booking) => {
-    const hallId = booking.hallId?._id?.toString() || booking.hallId?.toString();
+    const hallId =
+      booking.hallId?._id?.toString() || booking.hallId?.toString();
     return {
       _id: booking._id,
       hallId: booking.hallId?._id || booking.hallId,
