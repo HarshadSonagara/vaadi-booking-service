@@ -1,6 +1,39 @@
 import nodemailer from "nodemailer";
 
-// Create transporter with cloud-optimized settings for Render
+// Check if using Brevo API (recommended for Render and cloud platforms)
+const useBrevoApi = process.env.BREVO_API_KEY ? true : false;
+
+// Brevo HTTP API sender (bypasses SMTP port restrictions on Render)
+const sendWithBrevoApi = async (mailOptions) => {
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "accept": "application/json",
+      "api-key": process.env.BREVO_API_KEY,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      sender: {
+        name: process.env.EMAIL_FROM_NAME || "Community Vaadi Booking",
+        email: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+      },
+      to: [{ email: mailOptions.to }],
+      subject: mailOptions.subject,
+      htmlContent: mailOptions.html,
+      textContent: mailOptions.text,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || `Brevo API error: ${response.status}`);
+  }
+
+  const result = await response.json();
+  return { messageId: result.messageId };
+};
+
+// Create nodemailer transporter (fallback for non-Render environments)
 const createTransporter = () => {
   const port = parseInt(process.env.EMAIL_PORT) || 587;
   const isSecure = port === 465;
@@ -8,28 +41,36 @@ const createTransporter = () => {
   return nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: port,
-    secure: isSecure, // true for 465, false for 587
+    secure: isSecure,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD.replace(/\s+/g, ""),
     },
-    // Cloud-optimized connection settings
-    connectionTimeout: 60000, // 60 seconds
-    greetingTimeout: 30000, // 30 seconds
-    socketTimeout: 60000, // 60 seconds
-    // TLS settings for cloud environments
+    connectionTimeout: 60000,
+    greetingTimeout: 30000,
+    socketTimeout: 60000,
     tls: {
-      rejectUnauthorized: true, // Enable for production security
+      rejectUnauthorized: true,
       minVersion: "TLSv1.2",
     },
-    // Enable connection pooling for better reliability
     pool: true,
     maxConnections: 5,
     maxMessages: 100,
-    // Debug logging (disable in production if not needed)
     debug: process.env.NODE_ENV !== "production",
     logger: process.env.NODE_ENV !== "production",
   });
+};
+
+// Unified send function - uses Brevo API if available, falls back to SMTP
+const sendEmail = async (mailOptions) => {
+  if (useBrevoApi) {
+    console.log("Sending email via Brevo HTTP API...");
+    return await sendWithBrevoApi(mailOptions);
+  } else {
+    console.log("Sending email via SMTP...");
+    const transporter = createTransporter();
+    return await transporter.sendMail(mailOptions);
+  }
 };
 
 // Send verification email
@@ -40,8 +81,6 @@ export const sendVerificationEmail = async (
   frontendUrl
 ) => {
   try {
-    const transporter = createTransporter();
-
     // Verification link - FE will handle the token
     const verificationLink = `${frontendUrl}/verify-email?token=${verificationToken}`;
 
@@ -175,7 +214,7 @@ export const sendVerificationEmail = async (
       `,
     };
 
-    const info = await transporter.sendMail(mailOptions);
+    const info = await sendEmail(mailOptions);
     console.log("Verification email sent: %s", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
@@ -192,8 +231,6 @@ export const sendPasswordResetEmail = async (
   frontendUrl
 ) => {
   try {
-    const transporter = createTransporter();
-
     const resetLink = `${frontendUrl}/auth/reset-password?token=${resetToken}`;
 
     const mailOptions = {
@@ -326,7 +363,7 @@ export const sendPasswordResetEmail = async (
       `,
     };
 
-    const info = await transporter.sendMail(mailOptions);
+    const info = await sendEmail(mailOptions);
     console.log("Password reset email sent: %s", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
@@ -345,8 +382,6 @@ export const sendAccountCreatedEmail = async (
   frontendUrl
 ) => {
   try {
-    const transporter = createTransporter();
-
     const loginLink = `${frontendUrl}/auth/login`;
 
     const mailOptions = {
@@ -483,7 +518,7 @@ export const sendAccountCreatedEmail = async (
       `,
     };
 
-    const info = await transporter.sendMail(mailOptions);
+    const info = await sendEmail(mailOptions);
     console.log("Account created email sent: %s", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
@@ -499,8 +534,6 @@ export const sendBookingConfirmationEmail = async (
   isUpdate = false
 ) => {
   try {
-    const transporter = createTransporter();
-
     const {
       villagerName,
       hallName,
@@ -683,7 +716,7 @@ export const sendBookingConfirmationEmail = async (
       `,
     };
 
-    const info = await transporter.sendMail(mailOptions);
+    const info = await sendEmail(mailOptions);
     console.log("Booking confirmation email sent: %s", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
@@ -699,8 +732,6 @@ export const sendBookingCancellationEmail = async (
   bookingDetails
 ) => {
   try {
-    const transporter = createTransporter();
-
     const {
       villagerName,
       hallName,
@@ -870,7 +901,7 @@ export const sendBookingCancellationEmail = async (
       `,
     };
 
-    const info = await transporter.sendMail(mailOptions);
+    const info = await sendEmail(mailOptions);
     console.log("Booking cancellation email sent: %s", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
@@ -885,8 +916,6 @@ export const sendRefundNotificationEmail = async (
   bookingDetails
 ) => {
   try {
-    const transporter = createTransporter();
-
     const {
       villagerName,
       email,
@@ -1071,7 +1100,7 @@ export const sendRefundNotificationEmail = async (
       `,
     };
 
-    const info = await transporter.sendMail(mailOptions);
+    const info = await sendEmail(mailOptions);
     console.log("Refund notification email sent to team: %s", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
