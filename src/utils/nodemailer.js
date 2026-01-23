@@ -1,18 +1,34 @@
 import nodemailer from "nodemailer";
 
-// Create transporter
+// Create transporter with cloud-optimized settings for Render
 const createTransporter = () => {
+  const port = parseInt(process.env.EMAIL_PORT) || 587;
+  const isSecure = port === 465;
+
   return nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
-    port: parseInt(process.env.EMAIL_PORT),
-    secure: process.env.EMAIL_PORT == 465, // true for 465, false for other ports
+    port: port,
+    secure: isSecure, // true for 465, false for 587
     auth: {
       user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD.replace(/\s+/g, ""), // Remove any whitespace
+      pass: process.env.EMAIL_PASSWORD.replace(/\s+/g, ""),
     },
+    // Cloud-optimized connection settings
+    connectionTimeout: 60000, // 60 seconds
+    greetingTimeout: 30000, // 30 seconds
+    socketTimeout: 60000, // 60 seconds
+    // TLS settings for cloud environments
     tls: {
-      rejectUnauthorized: false, // For development only
+      rejectUnauthorized: true, // Enable for production security
+      minVersion: "TLSv1.2",
     },
+    // Enable connection pooling for better reliability
+    pool: true,
+    maxConnections: 5,
+    maxMessages: 100,
+    // Debug logging (disable in production if not needed)
+    debug: process.env.NODE_ENV !== "production",
+    logger: process.env.NODE_ENV !== "production",
   });
 };
 
