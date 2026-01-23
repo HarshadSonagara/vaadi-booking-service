@@ -5,6 +5,7 @@ import { Booking } from "../models/booking.model.js";
 import { Hall } from "../models/hall.model.js";
 import { Village } from "../models/village.model.js";
 import { isSuperAdmin } from "../middlewares/role.middleware.js";
+import { sendBookingConfirmationEmail } from "../utils/nodemailer.js";
 
 /**
  * Calculate total days between two dates (inclusive)
@@ -144,6 +145,7 @@ const createBooking = asyncHandler(async (req, res) => {
   const {
     villagerName,
     mobileNumber,
+    email,
     hallId,
     bookingReason,
     fromDate,
@@ -212,7 +214,7 @@ const createBooking = asyncHandler(async (req, res) => {
   const totalDays = calculateTotalDays(fromDate, toDate);
 
   // Create booking
-  const booking = await Booking.create({
+  const bookingData = {
     villagerName: villagerName.trim(),
     mobileNumber: mobileNumber.trim(),
     hallId,
@@ -224,12 +226,41 @@ const createBooking = asyncHandler(async (req, res) => {
     price: Number(price),
     villageName: req.user.villageName,
     createdBy: req.user._id,
-  });
+  };
+
+  // Add email if provided
+  if (email && email.trim()) {
+    bookingData.email = email.trim().toLowerCase();
+  }
+
+  const booking = await Booking.create(bookingData);
 
   const createdBooking = await Booking.findById(booking._id).populate(
     "createdBy",
     "fullName"
   );
+
+  // Send confirmation email if email is provided
+  if (createdBooking.email) {
+    sendBookingConfirmationEmail(
+      createdBooking.email,
+      {
+        villagerName: createdBooking.villagerName,
+        hallName: createdBooking.hallName,
+        bookingReason: createdBooking.bookingReason,
+        fromDate: createdBooking.fromDate,
+        toDate: createdBooking.toDate,
+        totalDays: createdBooking.totalDays,
+        price: createdBooking.price,
+        villageName: createdBooking.villageName,
+      },
+      false
+    )
+      .then((result) => console.log("Email send result:", result))
+      .catch((err) => console.error("Failed to send booking email:", err));
+  } else {
+    console.log("No email provided for booking, skipping email notification");
+  }
 
   return res
     .status(201)
@@ -244,6 +275,7 @@ const updateBooking = asyncHandler(async (req, res) => {
   const {
     villagerName,
     mobileNumber,
+    email,
     hallId,
     bookingReason,
     fromDate,
@@ -284,6 +316,10 @@ const updateBooking = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Mobile number cannot be empty");
     }
     updateData.mobileNumber = mobileNumber.trim();
+  }
+
+  if (email !== undefined) {
+    updateData.email = email ? email.trim().toLowerCase() : "";
   }
 
   if (bookingReason !== undefined) {
@@ -364,6 +400,32 @@ const updateBooking = asyncHandler(async (req, res) => {
     new: true,
     runValidators: true,
   }).populate("createdBy", "fullName");
+
+  // Send update confirmation email if email is provided
+  if (updatedBooking.email) {
+    sendBookingConfirmationEmail(
+      updatedBooking.email,
+      {
+        villagerName: updatedBooking.villagerName,
+        hallName: updatedBooking.hallName,
+        bookingReason: updatedBooking.bookingReason,
+        fromDate: updatedBooking.fromDate,
+        toDate: updatedBooking.toDate,
+        totalDays: updatedBooking.totalDays,
+        price: updatedBooking.price,
+        villageName: updatedBooking.villageName,
+      },
+      true
+    )
+      .then((result) => console.log("Email update result:", result))
+      .catch((err) =>
+        console.error("Failed to send booking update email:", err)
+      );
+  } else {
+    console.log(
+      "No email provided for booking update, skipping email notification"
+    );
+  }
 
   return res
     .status(200)

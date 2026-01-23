@@ -13,6 +13,11 @@ const bookingSchema = new Schema(
       required: [true, "Mobile number is required"],
       trim: true,
     },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+    },
     hallId: {
       type: Schema.Types.ObjectId,
       ref: "Hall",
