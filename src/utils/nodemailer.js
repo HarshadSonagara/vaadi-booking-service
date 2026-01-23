@@ -46,7 +46,7 @@ export const sendVerificationEmail = async (
     const verificationLink = `${frontendUrl}/verify-email?token=${verificationToken}`;
 
     const mailOptions = {
-      from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_USER}>`,
+      from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_FROM}>`,
       to: email,
       subject: "Verify Your Email - Community Vaadi Booking",
       html: `
@@ -197,7 +197,7 @@ export const sendPasswordResetEmail = async (
     const resetLink = `${frontendUrl}/auth/reset-password?token=${resetToken}`;
 
     const mailOptions = {
-      from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_USER}>`,
+      from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_FROM}>`,
       to: email,
       subject: "Password Reset Request - Community Vaadi Booking",
       html: `
@@ -350,7 +350,7 @@ export const sendAccountCreatedEmail = async (
     const loginLink = `${frontendUrl}/auth/login`;
 
     const mailOptions = {
-      from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_USER}>`,
+      from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_FROM}>`,
       to: email,
       subject: "Your Account Has Been Created - Community Vaadi Booking",
       html: `
@@ -534,7 +534,7 @@ export const sendBookingConfirmationEmail = async (
       : "Booking Confirmed!";
 
     const mailOptions = {
-      from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_USER}>`,
+      from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_FROM}>`,
       to: email,
       subject: subject,
       html: `
@@ -726,7 +726,7 @@ export const sendBookingCancellationEmail = async (
     const formattedPrice = `₹${Number(price).toLocaleString("en-IN")}`;
 
     const mailOptions = {
-      from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_USER}>`,
+      from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_FROM}>`,
       to: email,
       subject: `Booking Cancelled - ${villageName} Vaadi Booking`,
       html: `
@@ -914,7 +914,7 @@ export const sendRefundNotificationEmail = async (
     const formattedPrice = `₹${Number(price).toLocaleString("en-IN")}`;
 
     const mailOptions = {
-      from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_USER}>`,
+      from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_FROM}>`,
       to: teamEmail,
       subject: `Refund Required - Booking Cancelled - ${villageName} Vaadi Booking`,
       html: `
