@@ -676,3 +676,390 @@ export const sendBookingConfirmationEmail = async (
     return { success: false, error: error.message };
   }
 };
+
+// Send booking cancellation email to user
+export const sendBookingCancellationEmail = async (
+  email,
+  bookingDetails
+) => {
+  try {
+    const transporter = createTransporter();
+
+    const {
+      villagerName,
+      hallName,
+      bookingReason,
+      fromDate,
+      toDate,
+      totalDays,
+      price,
+      villageName,
+    } = bookingDetails;
+
+    // Format dates
+    const formatDate = (date) => {
+      return new Date(date).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+    };
+
+    const formattedFromDate = formatDate(fromDate);
+    const formattedToDate = formatDate(toDate);
+    const formattedPrice = `₹${Number(price).toLocaleString("en-IN")}`;
+
+    const mailOptions = {
+      from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: `Booking Cancelled - ${villageName} Vaadi Booking`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #000000; background-color: #f5f6f5; margin: 0; padding: 20px;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                  <!-- Header -->
+                  <tr>
+                    <td align="center" style="background-color: #9747ff; color: white; padding: 40px 20px;">
+                      <div style="font-size: 48px; margin-bottom: 10px;">✕</div>
+                      <h1 style="margin: 0; font-size: 24px; font-weight: 700;">Booking Cancelled</h1>
+                      <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">${villageName} Vaadi Booking</p>
+                    </td>
+                  </tr>
+                  <!-- Content -->
+                  <tr>
+                    <td style="background-color: #ffffff; padding: 40px 30px;">
+                      <h2 style="color: #000000; margin-top: 0; margin-bottom: 20px;">Hello ${villagerName}!</h2>
+                      <p style="color: #333333; margin-bottom: 15px;">Your booking has been cancelled successfully. Here are the details of the cancelled booking:</p>
+
+                      <!-- Booking Details Box -->
+                      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f5f6f5; border-radius: 8px; margin: 20px 0; border-left: 4px solid #9747ff;">
+                        <tr>
+                          <td style="padding: 25px;">
+                            <h3 style="margin-top: 0; color: #9747ff; font-size: 18px; margin-bottom: 15px;">Cancelled Booking Details</h3>
+
+                            <!-- Details List -->
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                                  <span style="color: #666666; font-weight: 500;">Name :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${villagerName}</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                                  <span style="color: #666666; font-weight: 500;">Hall :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${hallName}</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                                  <span style="color: #666666; font-weight: 500;">Village :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${villageName}</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                                  <span style="color: #666666; font-weight: 500;">Reason :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${bookingReason}</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                                  <span style="color: #666666; font-weight: 500;">From Date :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${formattedFromDate}</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                                  <span style="color: #666666; font-weight: 500;">To Date :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${formattedToDate}</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 12px 0;">
+                                  <span style="color: #666666; font-weight: 500;">Total Days :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${totalDays} day${
+        totalDays > 1 ? "s" : ""
+      }</span>
+                                </td>
+                              </tr>
+                            </table>
+
+                            <!-- Refund Amount Row -->
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #9747ff; border-radius: 8px; margin-top: 15px;">
+                              <tr>
+                                <td align="center" style="padding: 20px;">
+                                  <span style="color: rgba(255,255,255,0.9); font-weight: 500; font-size: 14px;">Refund Amount</span>
+                                  <br>
+                                  <span style="color: white; font-weight: 700; font-size: 28px; margin-top: 5px; display: inline-block;">${formattedPrice}</span>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <p style="color: #333333; margin-bottom: 15px; font-weight: 600;">Your refund will be processed by our team. You will receive a confirmation once the refund is completed.</p>
+                      <p style="color: #333333; margin-bottom: 15px;">If you have any questions about the cancellation or refund, please contact your village administrator.</p>
+
+                      <!-- Footer -->
+                      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                        <tr>
+                          <td style="font-size: 13px; color: #a3a4a9;">
+                            <p style="margin: 0;">Best regards,<br><strong>${villageName} Vaadi Booking Team</strong></p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+      `,
+      text: `
+        Booking Cancelled
+
+        Hello ${villagerName}!
+
+        Your booking has been cancelled successfully.
+
+        Cancelled Booking Details:
+        ---------------------------
+        Name: ${villagerName}
+        Hall: ${hallName}
+        Village: ${villageName}
+        Reason: ${bookingReason}
+        From Date: ${formattedFromDate}
+        To Date: ${formattedToDate}
+        Total Days: ${totalDays} day${totalDays > 1 ? "s" : ""}
+        Refund Amount: ${formattedPrice}
+
+        Your refund will be processed by our team. You will receive a confirmation once the refund is completed.
+
+        If you have any questions about the cancellation or refund, please contact your village administrator.
+
+        Best regards,
+        ${villageName} Vaadi Booking Team
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Booking cancellation email sent: %s", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error sending booking cancellation email:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Send refund notification email to team
+export const sendRefundNotificationEmail = async (
+  teamEmail,
+  bookingDetails
+) => {
+  try {
+    const transporter = createTransporter();
+
+    const {
+      villagerName,
+      email,
+      mobileNumber,
+      hallName,
+      bookingReason,
+      fromDate,
+      toDate,
+      totalDays,
+      price,
+      villageName,
+    } = bookingDetails;
+
+    // Format dates
+    const formatDate = (date) => {
+      return new Date(date).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+    };
+
+    const formattedFromDate = formatDate(fromDate);
+    const formattedToDate = formatDate(toDate);
+    const formattedPrice = `₹${Number(price).toLocaleString("en-IN")}`;
+
+    const mailOptions = {
+      from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_USER}>`,
+      to: teamEmail,
+      subject: `Refund Required - Booking Cancelled - ${villageName} Vaadi Booking`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #000000; background-color: #f5f6f5; margin: 0; padding: 20px;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                  <!-- Header -->
+                  <tr>
+                    <td align="center" style="background-color: #f39c12; color: white; padding: 40px 20px;">
+                      <div style="font-size: 48px; margin-bottom: 10px;">⚠</div>
+                      <h1 style="margin: 0; font-size: 24px; font-weight: 700;">Refund Required</h1>
+                      <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">${villageName} Vaadi Booking</p>
+                    </td>
+                  </tr>
+                  <!-- Content -->
+                  <tr>
+                    <td style="background-color: #ffffff; padding: 40px 30px;">
+                      <h2 style="color: #000000; margin-top: 0; margin-bottom: 20px;">Team Notification</h2>
+                      <p style="color: #333333; margin-bottom: 15px; font-weight: 600;">A booking has been cancelled and requires refund processing.</p>
+
+                      <!-- Booking Details Box -->
+                      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f5f6f5; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f39c12;">
+                        <tr>
+                          <td style="padding: 25px;">
+                            <h3 style="margin-top: 0; color: #f39c12; font-size: 18px; margin-bottom: 15px;">Cancelled Booking Details</h3>
+
+                            <!-- Details List -->
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                                  <span style="color: #666666; font-weight: 500;">Villager Name :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${villagerName}</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                                  <span style="color: #666666; font-weight: 500;">Email :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${email || "Not provided"}</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                                  <span style="color: #666666; font-weight: 500;">Mobile Number :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${mobileNumber}</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                                  <span style="color: #666666; font-weight: 500;">Hall :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${hallName}</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                                  <span style="color: #666666; font-weight: 500;">Village :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${villageName}</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                                  <span style="color: #666666; font-weight: 500;">Reason :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${bookingReason}</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                                  <span style="color: #666666; font-weight: 500;">From Date :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${formattedFromDate}</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
+                                  <span style="color: #666666; font-weight: 500;">To Date :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${formattedToDate}</span>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td style="padding: 12px 0;">
+                                  <span style="color: #666666; font-weight: 500;">Total Days :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${totalDays} day${
+        totalDays > 1 ? "s" : ""
+      }</span>
+                                </td>
+                              </tr>
+                            </table>
+
+                            <!-- Refund Amount Row -->
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f39c12; border-radius: 8px; margin-top: 15px;">
+                              <tr>
+                                <td align="center" style="padding: 20px;">
+                                  <span style="color: rgba(255,255,255,0.9); font-weight: 500; font-size: 14px;">Refund Amount Required</span>
+                                  <br>
+                                  <span style="color: white; font-weight: 700; font-size: 28px; margin-top: 5px; display: inline-block;">${formattedPrice}</span>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <p style="color: #333333; margin-bottom: 15px; font-weight: 600;">Please process the refund for this cancelled booking at your earliest convenience.</p>
+                      <p style="color: #333333; margin-bottom: 15px;">Contact the customer using the details provided above if needed.</p>
+
+                      <!-- Footer -->
+                      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                        <tr>
+                          <td style="font-size: 13px; color: #a3a4a9;">
+                            <p style="margin: 0;">This is an automated notification from<br><strong>${villageName} Vaadi Booking System</strong></p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+      `,
+      text: `
+        Refund Required - Booking Cancelled
+
+        Team Notification
+
+        A booking has been cancelled and requires refund processing.
+
+        Cancelled Booking Details:
+        ---------------------------
+        Villager Name: ${villagerName}
+        Email: ${email || "Not provided"}
+        Mobile Number: ${mobileNumber}
+        Hall: ${hallName}
+        Village: ${villageName}
+        Reason: ${bookingReason}
+        From Date: ${formattedFromDate}
+        To Date: ${formattedToDate}
+        Total Days: ${totalDays} day${totalDays > 1 ? "s" : ""}
+        Refund Amount Required: ${formattedPrice}
+
+        Please process the refund for this cancelled booking at your earliest convenience.
+
+        Contact the customer using the details provided above if needed.
+
+        This is an automated notification from ${villageName} Vaadi Booking System
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Refund notification email sent to team: %s", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error sending refund notification email:", error);
+    return { success: false, error: error.message };
+  }
+};

@@ -5,7 +5,11 @@ import { Booking } from "../models/booking.model.js";
 import { Hall } from "../models/hall.model.js";
 import { Village } from "../models/village.model.js";
 import { isSuperAdmin } from "../middlewares/role.middleware.js";
-import { sendBookingConfirmationEmail } from "../utils/nodemailer.js";
+import {
+  sendBookingConfirmationEmail,
+  sendBookingCancellationEmail,
+  sendRefundNotificationEmail,
+} from "../utils/nodemailer.js";
 
 /**
  * Calculate total days between two dates (inclusive)
@@ -433,12 +437,12 @@ const updateBooking = asyncHandler(async (req, res) => {
 });
 
 /**
- * Cancel booking (soft delete)
+ * Cancel booking (hard delete from database)
  */
 const cancelBooking = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const booking = await Booking.findById(id);
+  const booking = await Booking.findById(id).populate("createdBy", "fullName");
 
   if (!booking) {
     throw new ApiError(404, "Booking not found");
@@ -456,16 +460,57 @@ const cancelBooking = asyncHandler(async (req, res) => {
     );
   }
 
-  const cancelledBooking = await Booking.findByIdAndUpdate(
-    id,
-    { isCancelled: true },
-    { new: true }
-  ).populate("createdBy", "fullName");
+  // Prepare booking details for emails
+  const bookingDetails = {
+    villagerName: booking.villagerName,
+    email: booking.email,
+    mobileNumber: booking.mobileNumber,
+    hallName: booking.hallName,
+    bookingReason: booking.bookingReason,
+    fromDate: booking.fromDate,
+    toDate: booking.toDate,
+    totalDays: booking.totalDays,
+    price: booking.price,
+    villageName: booking.villageName,
+  };
+
+  // Delete booking from database (hard delete)
+  const deletedBooking = await Booking.findByIdAndDelete(id);
+
+  if (!deletedBooking) {
+    throw new ApiError(404, "Booking not found");
+  }
+
+  // Send cancellation email to user if email is provided
+  if (booking.email) {
+    sendBookingCancellationEmail(booking.email, bookingDetails)
+      .then((result) => console.log("Cancellation email send result:", result))
+      .catch((err) =>
+        console.error("Failed to send cancellation email:", err)
+      );
+  } else {
+    console.log(
+      "No email provided for booking cancellation, skipping email notification"
+    );
+  }
+
+  const teamEmail = process.env.TEAM_EMAIL || process.env.EMAIL_USER;
+  if (teamEmail) {
+    sendRefundNotificationEmail(teamEmail, bookingDetails)
+      .then((result) =>
+        console.log("Refund notification email send result:", result)
+      )
+      .catch((err) =>
+        console.error("Failed to send refund notification email:", err)
+      );
+  } else {
+    console.log("No team email configured, skipping refund notification email");
+  }
 
   return res
     .status(200)
     .json(
-      new ApiResponse(200, cancelledBooking, "Booking cancelled successfully")
+      new ApiResponse(200, deletedBooking, "Booking cancelled and deleted successfully")
     );
 });
 

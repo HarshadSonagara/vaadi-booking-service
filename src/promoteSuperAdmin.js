@@ -12,10 +12,10 @@ const ensureSuperAdmin = async () => {
         await connectDB();
         
         const email = "harshadsonagara@gmail.com";
-        const password = "Harshad@1309";
+        const password = "Harshad@123";
         const fullName = "Harshad Sonagara";
-        const mobileNumber = "1234567890"; // Dummy
-        const villageName = "AdminVillage"; // Dummy
+        const mobileNumber = "6354426645";
+        const villageName = "Super Admin"; // System-level account
 
         let user = await User.findOne({ email });
         
