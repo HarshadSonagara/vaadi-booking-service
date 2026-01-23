@@ -598,7 +598,9 @@ export const sendBookingConfirmationEmail = async (
                               <tr>
                                 <td style="padding: 12px 0;">
                                   <span style="color: #666666; font-weight: 500;">Total Days :</span>&nbsp;&nbsp;&nbsp;
-                                  <span style="color: #000000; font-weight: 600;">${totalDays} day${totalDays > 1 ? "s" : ""}</span>
+                                  <span style="color: #000000; font-weight: 600;">${totalDays} day${
+                                    totalDays > 1 ? "s" : ""
+                                  }</span>
                                 </td>
                               </tr>
                             </table>
@@ -656,7 +658,7 @@ export const sendBookingConfirmationEmail = async (
         From Date: ${formattedFromDate}
         To Date: ${formattedToDate}
         Total Days: ${totalDays} day${totalDays > 1 ? "s" : ""}
-        Amount Paid: ${formattedPrice}
+        Amount: ${formattedPrice}
 
         If you have any questions about your booking, please contact your village administrator.
 
@@ -674,4 +676,3 @@ export const sendBookingConfirmationEmail = async (
     return { success: false, error: error.message };
   }
 };
-
