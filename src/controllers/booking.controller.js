@@ -224,7 +224,7 @@ const createBooking = asyncHandler(async (req, res) => {
     toDate: new Date(toDate),
     totalDays,
     price: Number(price),
-    villageName: req.user.villageName,
+    villageName: hall.villageName, // Use hall's village for correct association
     createdBy: req.user._id,
   };
 
@@ -470,9 +470,22 @@ const cancelBooking = asyncHandler(async (req, res) => {
 });
 
 const getAvailableHalls = asyncHandler(async (req, res) => {
+  const { villageId } = req.query;
+
+  let villageName = req.user.villageName;
+
+  // For super admin, allow fetching halls by villageId
+  if (isSuperAdmin(req.user) && villageId) {
+    const village = await Village.findById(villageId);
+    if (!village) {
+      throw new ApiError(404, "Village not found");
+    }
+    villageName = village.name;
+  }
+
   const query = {
     status: "Active",
-    villageName: req.user.villageName,
+    villageName: villageName,
   };
 
   const halls = await Hall.find(query).select("_id name").sort({ name: 1 });
