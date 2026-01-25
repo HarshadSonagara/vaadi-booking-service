@@ -87,7 +87,7 @@ export const sendVerificationEmail = async (
     const mailOptions = {
       from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_FROM}>`,
       to: email,
-      subject: "Verify Your Email - Community Vaadi Booking",
+      subject: "તમારો ઈમેલ ચકાસો - સમુદાય વાડી બુકિંગ",
       html: `
         <!DOCTYPE html>
         <html>
@@ -174,23 +174,23 @@ export const sendVerificationEmail = async (
         <body>
           <div class="container">
             <div class="header">
-              <h1>Community Vaadi Booking</h1>
+              <h1>સમુદાય વાડી બુકિંગ</h1>
             </div>
             <div class="content">
-              <h2>Welcome ${fullName}!</h2>
-              <p>Thank you for registering with Community Vaadi Booking System.</p>
-              <p>Please verify your email address by clicking the button below:</p>
+              <h2>સ્વાગત છે ${fullName}!</h2>
+              <p>સમુદાય વાડી બુકિંગ સિસ્ટમમાં નોંધણી કરવા બદલ આભાર.</p>
+              <p>કૃપા કરીને નીચેના બટન પર ક્લિક કરીને તમારું ઈમેલ સરનામું ચકાસો:</p>
               <center>
-                <a href="${verificationLink}" class="button">Verify Email</a>
+                <a href="${verificationLink}" class="button">ઈમેલ ચકાસો</a>
               </center>
-              <p>Or copy and paste this link in your browser:</p>
+              <p>અથવા આ લિંકને તમારા બ્રાઉઝરમાં કોપી અને પેસ્ટ કરો:</p>
               <div class="link-box">
                 <a href="${verificationLink}">${verificationLink}</a>
               </div>
-              <p class="warning">This link will expire in 24 hours.</p>
-              <p>If you didn't create an account, please ignore this email.</p>
+              <p class="warning">આ લિંક ૨૪ કલાકમાં સમાપ્ત થઈ જશે.</p>
+              <p>જો તમે એકાઉન્ટ બનાવ્યું નથી, તો કૃપા કરીને આ ઈમેલને અવગણો.</p>
               <div class="footer">
-                <p>Best regards,<br><strong>Community Vaadi Booking Team</strong></p>
+                <p>શુભેચ્છા સાથે,<br><strong>સમુદાય વાડી બુકિંગ ટીમ</strong></p>
               </div>
             </div>
           </div>
@@ -198,19 +198,19 @@ export const sendVerificationEmail = async (
         </html>
       `,
       text: `
-        Welcome ${fullName}!
+        સ્વાગત છે ${fullName}!
 
-        Thank you for registering with Community Vaadi Booking System.
+        સમુદાય વાડી બુકિંગ સિસ્ટમમાં નોંધણી કરવા બદલ આભાર.
 
-        Please verify your email address by clicking the link below:
+        કૃપા કરીને નીચેની લિંક પર ક્લિક કરીને તમારું ઈમેલ સરનામું ચકાસો:
         ${verificationLink}
 
-        This link will expire in 24 hours.
+        આ લિંક ૨૪ કલાકમાં સમાપ્ત થઈ જશે.
 
-        If you didn't create an account, please ignore this email.
+        જો તમે એકાઉન્ટ બનાવ્યું નથી, તો કૃપા કરીને આ ઈમેલને અવગણો.
 
-        Best regards,
-        Community Vaadi Booking Team
+        શુભેચ્છા સાથે,
+        સમુદાય વાડી બુકિંગ ટીમ
       `,
     };
 
@@ -236,7 +236,7 @@ export const sendPasswordResetEmail = async (
     const mailOptions = {
       from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_FROM}>`,
       to: email,
-      subject: "Password Reset Request - Community Vaadi Booking",
+      subject: "પાસવર્ડ રીસેટ વિનંતી - સમુદાય વાડી બુકિંગ",
       html: `
         <!DOCTYPE html>
         <html>
@@ -323,23 +323,23 @@ export const sendPasswordResetEmail = async (
         <body>
           <div class="container">
             <div class="header">
-              <h1>Password Reset Request</h1>
+              <h1>પાસવર્ડ રીસેટ વિનંતી</h1>
             </div>
             <div class="content">
-              <h2>Hello ${fullName},</h2>
-              <p>We received a request to reset your password for your Community Vaadi Booking account.</p>
-              <p>Click the button below to reset your password:</p>
+              <h2>નમસ્તે ${fullName},</h2>
+              <p>અમને તમારા સમુદાય વાડી બુકિંગ એકાઉન્ટ માટે પાસવર્ડ રીસેટ કરવાની વિનંતી મળી છે.</p>
+              <p>તમારો પાસવર્ડ રીસેટ કરવા નીચેના બટન પર ક્લિક કરો:</p>
               <center>
-                <a href="${resetLink}" class="button">Reset Password</a>
+                <a href="${resetLink}" class="button">પાસવર્ડ રીસેટ કરો</a>
               </center>
-              <p>Or copy and paste this link in your browser:</p>
+              <p>અથવા આ લિંકને તમારા બ્રાઉઝરમાં કોપી અને પેસ્ટ કરો:</p>
               <div class="link-box">
                 <a href="${resetLink}">${resetLink}</a>
               </div>
-              <p class="warning">This link will expire in 1 hour.</p>
-              <p>If you didn't request a password reset, please ignore this email or contact support if you have concerns.</p>
+              <p class="warning">આ લિંક ૧ કલાકમાં સમાપ્ત થઈ જશે.</p>
+              <p>જો તમે પાસવર્ડ રીસેટ કરવાની વિનંતી કરી નથી, તો કૃપા કરીને આ ઈમેલને અવગણો અથવા જો તમને ચિંતા હોય તો સપોર્ટનો સંપર્ક કરો.</p>
               <div class="footer">
-                <p>Best regards,<br><strong>Community Vaadi Booking Team</strong></p>
+                <p>શુભેચ્છા સાથે,<br><strong>સમુદાય વાડી બુકિંગ ટીમ</strong></p>
               </div>
             </div>
           </div>
@@ -347,19 +347,19 @@ export const sendPasswordResetEmail = async (
         </html>
       `,
       text: `
-        Hello ${fullName},
+        નમસ્તે ${fullName},
 
-        We received a request to reset your password for your Community Vaadi Booking account.
+        અમને તમારા સમુદાય વાડી બુકિંગ એકાઉન્ટ માટે પાસવર્ડ રીસેટ કરવાની વિનંતી મળી છે.
 
-        Click the link below to reset your password:
+        તમારો પાસવર્ડ રીસેટ કરવા નીચેની લિંક પર ક્લિક કરો:
         ${resetLink}
 
-        This link will expire in 1 hour.
+        આ લિંક ૧ કલાકમાં સમાપ્ત થઈ જશે.
 
-        If you didn't request a password reset, please ignore this email.
+        જો તમે પાસવર્ડ રીસેટ કરવાની વિનંતી કરી નથી, તો કૃપા કરીને આ ઈમેલને અવગણો.
 
-        Best regards,
-        Community Vaadi Booking Team
+        શુભેચ્છા સાથે,
+        સમુદાય વાડી બુકિંગ ટીમ
       `,
     };
 
@@ -387,7 +387,7 @@ export const sendAccountCreatedEmail = async (
     const mailOptions = {
       from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_FROM}>`,
       to: email,
-      subject: "Your Account Has Been Created - Community Vaadi Booking",
+      subject: "તમારું એકાઉન્ટ બનાવવામાં આવ્યું છે - સમુદાય વાડી બુકિંગ",
       html: `
         <!DOCTYPE html>
         <html>
@@ -474,24 +474,24 @@ export const sendAccountCreatedEmail = async (
         <body>
           <div class="container">
             <div class="header">
-              <h1>Welcome to Community Vaadi Booking!</h1>
+              <h1>સમુદાય વાડી બુકિંગમાં સ્વાગત છે!</h1>
             </div>
             <div class="content">
-              <h2>Hello ${fullName}!</h2>
-              <p>Your account has been successfully created by the administrator.</p>
-              <p>Here are your login credentials:</p>
+              <h2>નમસ્તે ${fullName}!</h2>
+              <p>એડમિનિસ્ટ્રેટર દ્વારા તમારું એકાઉન્ટ સફળતાપૂર્વક બનાવવામાં આવ્યું છે.</p>
+              <p>અહીં તમારી લૉગિન માહિતી છે:</p>
               <div class="credentials-box">
-                <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Password:</strong> ${password}</p>
-                <p><strong>Role:</strong> ${role}</p>
-                <p><strong>Village:</strong> ${villageName}</p>
+                <p><strong>ઈમેલ:</strong> ${email}</p>
+                <p><strong>પાસવર્ડ:</strong> ${password}</p>
+                <p><strong>ભૂમિકા:</strong> ${role}</p>
+                <p><strong>ગામ:</strong> ${villageName}</p>
               </div>
               <center>
-                <a href="${loginLink}" class="button">Login Now</a>
+                <a href="${loginLink}" class="button">હમણાં લૉગિન કરો</a>
               </center>
-              <p class="warning">Please change your password after your first login for security.</p>
+              <p class="warning">સુરક્ષા માટે કૃપા કરીને તમારા પ્રથમ લૉગિન પછી તમારો પાસવર્ડ બદલો.</p>
               <div class="footer">
-                <p>Best regards,<br><strong>Community Vaadi Booking Team</strong></p>
+                <p>શુભેચ્છા સાથે,<br><strong>સમુદાય વાડી બુકિંગ ટીમ</strong></p>
               </div>
             </div>
           </div>
@@ -499,22 +499,22 @@ export const sendAccountCreatedEmail = async (
         </html>
       `,
       text: `
-        Hello ${fullName}!
+        નમસ્તે ${fullName}!
 
-        Your account has been successfully created by the administrator.
+        એડમિનિસ્ટ્રેટર દ્વારા તમારું એકાઉન્ટ સફળતાપૂર્વક બનાવવામાં આવ્યું છે.
 
-        Here are your login credentials:
-        Email: ${email}
-        Password: ${password}
-        Role: ${role}
-        Village: ${villageName}
+        અહીં તમારી લૉગિન માહિતી છે:
+        ઈમેલ: ${email}
+        પાસવર્ડ: ${password}
+        ભૂમિકા: ${role}
+        ગામ: ${villageName}
 
-        Login here: ${loginLink}
+        અહીં લૉગિન કરો: ${loginLink}
 
-        Please change your password after your first login for security.
+        સુરક્ષા માટે કૃપા કરીને તમારા પ્રથમ લૉગિન પછી તમારો પાસવર્ડ બદલો.
 
-        Best regards,
-        Community Vaadi Booking Team
+        શુભેચ્છા સાથે,
+        સમુદાય વાડી બુકિંગ ટીમ
       `,
     };
 
@@ -559,12 +559,12 @@ export const sendBookingConfirmationEmail = async (
     const formattedPrice = `₹${Number(price).toLocaleString("en-IN")}`;
 
     const subject = isUpdate
-      ? `Booking Updated - ${villageName} Vaadi Booking`
-      : `Booking Confirmation - ${villageName} Vaadi Booking`;
+      ? `બુકિંગ અપડેટ થયું - ${villageName} વાડી બુકિંગ`
+      : `બુકિંગ કન્ફર્મેશન - ${villageName} વાડી બુકિંગ`;
 
     const headerTitle = isUpdate
-      ? "Your Booking Has Been Updated!"
-      : "Booking Confirmed!";
+      ? "તમારું બુકિંગ અપડેટ થયું છે!"
+      : "બુકિંગ કન્ફર્મ થયું!";
 
     const mailOptions = {
       from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_FROM}>`,
@@ -593,63 +593,61 @@ export const sendBookingConfirmationEmail = async (
                   <!-- Content -->
                   <tr>
                     <td style="background-color: #ffffff; padding: 40px 30px;">
-                      <h2 style="color: #000000; margin-top: 0; margin-bottom: 20px;">Hello ${villagerName}!</h2>
+                      <h2 style="color: #000000; margin-top: 0; margin-bottom: 20px;">નમસ્તે ${villagerName}!</h2>
                       <p style="color: #333333; margin-bottom: 15px;">${
                         isUpdate
-                          ? "Your vaadi booking has been successfully updated. Here are your updated booking details:"
-                          : "Thank you for your booking! Your vaadi has been successfully reserved. Here are your booking details:"
+                          ? "તમારું વાડી બુકિંગ સફળતાપૂર્વક અપડેટ થયું છે. અહીં તમારી અપડેટ થયેલી બુકિંગ વિગતો છે:"
+                          : "તમારા બુકિંગ માટે આભાર! તમારી વાડી સફળતાપૂર્વક આરક્ષિત થઈ છે. અહીં તમારી બુકિંગ વિગતો છે:"
                       }</p>
 
                       <!-- Booking Details Box -->
                       <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f5f6f5; border-radius: 8px; margin: 20px 0; border-left: 4px solid #9747ff;">
                         <tr>
                           <td style="padding: 25px;">
-                            <h3 style="margin-top: 0; color: #9747ff; font-size: 18px; margin-bottom: 15px;">Booking Details</h3>
+                            <h3 style="margin-top: 0; color: #9747ff; font-size: 18px; margin-bottom: 15px;">બુકિંગ વિગતો</h3>
 
                             <!-- Details List -->
                             <table width="100%" cellpadding="0" cellspacing="0" border="0">
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">Name :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">નામ :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${villagerName}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">Hall :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">હોલ :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${hallName}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">Village :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">ગામ :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${villageName}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">Reason :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">કારણ :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${bookingReason}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">From Date :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">તારીખથી :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${formattedFromDate}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">To Date :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">તારીખ સુધી :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${formattedToDate}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0;">
-                                  <span style="color: #666666; font-weight: 500;">Total Days :</span>&nbsp;&nbsp;&nbsp;
-                                  <span style="color: #000000; font-weight: 600;">${totalDays} day${
-                                    totalDays > 1 ? "s" : ""
-                                  }</span>
+                                  <span style="color: #666666; font-weight: 500;">કુલ દિવસો :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${totalDays} દિવસ</span>
                                 </td>
                               </tr>
                             </table>
@@ -658,7 +656,7 @@ export const sendBookingConfirmationEmail = async (
                             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #9747ff; border-radius: 8px; margin-top: 15px;">
                               <tr>
                                 <td align="center" style="padding: 20px;">
-                                  <span style="color: rgba(255,255,255,0.9); font-weight: 500; font-size: 14px;">Amount Paid</span>
+                                  <span style="color: rgba(255,255,255,0.9); font-weight: 500; font-size: 14px;">ચૂકવેલ રકમ</span>
                                   <br>
                                   <span style="color: white; font-weight: 700; font-size: 28px; margin-top: 5px; display: inline-block;">${formattedPrice}</span>
                                 </td>
@@ -668,13 +666,13 @@ export const sendBookingConfirmationEmail = async (
                         </tr>
                       </table>
 
-                      <p style="color: #333333; margin-bottom: 15px;">If you have any questions about your booking, please contact your village administrator.</p>
+                      <p style="color: #333333; margin-bottom: 15px;">જો તમને તમારા બુકિંગ વિશે કોઈ પ્રશ્નો હોય, તો કૃપા કરીને તમારા ગામના એડમિનિસ્ટ્રેટરનો સંપર્ક કરો.</p>
 
                       <!-- Footer -->
                       <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
                         <tr>
                           <td style="font-size: 13px; color: #a3a4a9;">
-                            <p style="margin: 0;">Best regards,<br><strong>${villageName} Vaadi Booking Team</strong></p>
+                            <p style="margin: 0;">શુભેચ્છા સાથે,<br><strong>${villageName} વાડી બુકિંગ ટીમ</strong></p>
                           </td>
                         </tr>
                       </table>
@@ -690,29 +688,29 @@ export const sendBookingConfirmationEmail = async (
       text: `
         ${headerTitle}
 
-        Hello ${villagerName}!
+        નમસ્તે ${villagerName}!
 
         ${
           isUpdate
-            ? "Your vaadi booking has been successfully updated."
-            : "Thank you for your booking! Your vaadi has been successfully reserved."
+            ? "તમારું વાડી બુકિંગ સફળતાપૂર્વક અપડેટ થયું છે."
+            : "તમારા બુકિંગ માટે આભાર! તમારી વાડી સફળતાપૂર્વક આરક્ષિત થઈ છે."
         }
 
-        Booking Details:
+        બુકિંગ વિગતો:
         ----------------
-        Name: ${villagerName}
-        Hall: ${hallName}
-        Village: ${villageName}
-        Reason: ${bookingReason}
-        From Date: ${formattedFromDate}
-        To Date: ${formattedToDate}
-        Total Days: ${totalDays} day${totalDays > 1 ? "s" : ""}
-        Amount: ${formattedPrice}
+        નામ: ${villagerName}
+        હોલ: ${hallName}
+        ગામ: ${villageName}
+        કારણ: ${bookingReason}
+        તારીખથી: ${formattedFromDate}
+        તારીખ સુધી: ${formattedToDate}
+        કુલ દિવસો: ${totalDays} દિવસ
+        રકમ: ${formattedPrice}
 
-        If you have any questions about your booking, please contact your village administrator.
+        જો તમને તમારા બુકિંગ વિશે કોઈ પ્રશ્નો હોય, તો કૃપા કરીને તમારા ગામના એડમિનિસ્ટ્રેટરનો સંપર્ક કરો.
 
-        Best regards,
-        ${villageName} Vaadi Booking Team
+        શુભેચ્છા સાથે,
+        ${villageName} વાડી બુકિંગ ટીમ
       `,
     };
 
@@ -759,7 +757,7 @@ export const sendBookingCancellationEmail = async (
     const mailOptions = {
       from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_FROM}>`,
       to: email,
-      subject: `Booking Cancelled - ${villageName} Vaadi Booking`,
+      subject: `બુકિંગ રદ થયું - ${villageName} વાડી બુકિંગ`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -776,66 +774,64 @@ export const sendBookingCancellationEmail = async (
                   <tr>
                     <td align="center" style="background-color: #9747ff; color: white; padding: 40px 20px;">
                       <div style="font-size: 48px; margin-bottom: 10px;">✕</div>
-                      <h1 style="margin: 0; font-size: 24px; font-weight: 700;">Booking Cancelled</h1>
-                      <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">${villageName} Vaadi Booking</p>
+                      <h1 style="margin: 0; font-size: 24px; font-weight: 700;">બુકિંગ રદ થયું</h1>
+                      <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">${villageName} વાડી બુકિંગ</p>
                     </td>
                   </tr>
                   <!-- Content -->
                   <tr>
                     <td style="background-color: #ffffff; padding: 40px 30px;">
-                      <h2 style="color: #000000; margin-top: 0; margin-bottom: 20px;">Hello ${villagerName}!</h2>
-                      <p style="color: #333333; margin-bottom: 15px;">Your booking has been cancelled successfully. Here are the details of the cancelled booking:</p>
+                      <h2 style="color: #000000; margin-top: 0; margin-bottom: 20px;">નમસ્તે ${villagerName}!</h2>
+                      <p style="color: #333333; margin-bottom: 15px;">તમારું બુકિંગ સફળતાપૂર્વક રદ થયું છે. અહીં રદ થયેલા બુકિંગની વિગતો છે:</p>
 
                       <!-- Booking Details Box -->
                       <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f5f6f5; border-radius: 8px; margin: 20px 0; border-left: 4px solid #9747ff;">
                         <tr>
                           <td style="padding: 25px;">
-                            <h3 style="margin-top: 0; color: #9747ff; font-size: 18px; margin-bottom: 15px;">Cancelled Booking Details</h3>
+                            <h3 style="margin-top: 0; color: #9747ff; font-size: 18px; margin-bottom: 15px;">રદ થયેલા બુકિંગની વિગતો</h3>
 
                             <!-- Details List -->
                             <table width="100%" cellpadding="0" cellspacing="0" border="0">
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">Name :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">નામ :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${villagerName}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">Hall :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">હોલ :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${hallName}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">Village :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">ગામ :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${villageName}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">Reason :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">કારણ :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${bookingReason}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">From Date :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">તારીખથી :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${formattedFromDate}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">To Date :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">તારીખ સુધી :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${formattedToDate}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0;">
-                                  <span style="color: #666666; font-weight: 500;">Total Days :</span>&nbsp;&nbsp;&nbsp;
-                                  <span style="color: #000000; font-weight: 600;">${totalDays} day${
-        totalDays > 1 ? "s" : ""
-      }</span>
+                                  <span style="color: #666666; font-weight: 500;">કુલ દિવસો :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${totalDays} દિવસ</span>
                                 </td>
                               </tr>
                             </table>
@@ -844,7 +840,7 @@ export const sendBookingCancellationEmail = async (
                             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #9747ff; border-radius: 8px; margin-top: 15px;">
                               <tr>
                                 <td align="center" style="padding: 20px;">
-                                  <span style="color: rgba(255,255,255,0.9); font-weight: 500; font-size: 14px;">Refund Amount</span>
+                                  <span style="color: rgba(255,255,255,0.9); font-weight: 500; font-size: 14px;">રિફંડ રકમ</span>
                                   <br>
                                   <span style="color: white; font-weight: 700; font-size: 28px; margin-top: 5px; display: inline-block;">${formattedPrice}</span>
                                 </td>
@@ -854,14 +850,14 @@ export const sendBookingCancellationEmail = async (
                         </tr>
                       </table>
 
-                      <p style="color: #333333; margin-bottom: 15px; font-weight: 600;">Your refund will be processed by our team. You will receive a confirmation once the refund is completed.</p>
-                      <p style="color: #333333; margin-bottom: 15px;">If you have any questions about the cancellation or refund, please contact your village administrator.</p>
+                      <p style="color: #333333; margin-bottom: 15px; font-weight: 600;">તમારું રિફંડ અમારી ટીમ દ્વારા પ્રોસેસ કરવામાં આવશે. રિફંડ પૂર્ણ થયા પછી તમને કન્ફર્મેશન મળશે.</p>
+                      <p style="color: #333333; margin-bottom: 15px;">જો તમને રદ કરવા અથવા રિફંડ વિશે કોઈ પ્રશ્નો હોય, તો કૃપા કરીને તમારા ગામના એડમિનિસ્ટ્રેટરનો સંપર્ક કરો.</p>
 
                       <!-- Footer -->
                       <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
                         <tr>
                           <td style="font-size: 13px; color: #a3a4a9;">
-                            <p style="margin: 0;">Best regards,<br><strong>${villageName} Vaadi Booking Team</strong></p>
+                            <p style="margin: 0;">શુભેચ્છા સાથે,<br><strong>${villageName} વાડી બુકિંગ ટીમ</strong></p>
                           </td>
                         </tr>
                       </table>
@@ -875,29 +871,29 @@ export const sendBookingCancellationEmail = async (
         </html>
       `,
       text: `
-        Booking Cancelled
+        બુકિંગ રદ થયું
 
-        Hello ${villagerName}!
+        નમસ્તે ${villagerName}!
 
-        Your booking has been cancelled successfully.
+        તમારું બુકિંગ સફળતાપૂર્વક રદ થયું છે.
 
-        Cancelled Booking Details:
+        રદ થયેલા બુકિંગની વિગતો:
         ---------------------------
-        Name: ${villagerName}
-        Hall: ${hallName}
-        Village: ${villageName}
-        Reason: ${bookingReason}
-        From Date: ${formattedFromDate}
-        To Date: ${formattedToDate}
-        Total Days: ${totalDays} day${totalDays > 1 ? "s" : ""}
-        Refund Amount: ${formattedPrice}
+        નામ: ${villagerName}
+        હોલ: ${hallName}
+        ગામ: ${villageName}
+        કારણ: ${bookingReason}
+        તારીખથી: ${formattedFromDate}
+        તારીખ સુધી: ${formattedToDate}
+        કુલ દિવસો: ${totalDays} દિવસ
+        રિફંડ રકમ: ${formattedPrice}
 
-        Your refund will be processed by our team. You will receive a confirmation once the refund is completed.
+        તમારું રિફંડ અમારી ટીમ દ્વારા પ્રોસેસ કરવામાં આવશે. રિફંડ પૂર્ણ થયા પછી તમને કન્ફર્મેશન મળશે.
 
-        If you have any questions about the cancellation or refund, please contact your village administrator.
+        જો તમને રદ કરવા અથવા રિફંડ વિશે કોઈ પ્રશ્નો હોય, તો કૃપા કરીને તમારા ગામના એડમિનિસ્ટ્રેટરનો સંપર્ક કરો.
 
-        Best regards,
-        ${villageName} Vaadi Booking Team
+        શુભેચ્છા સાથે,
+        ${villageName} વાડી બુકિંગ ટીમ
       `,
     };
 
@@ -945,7 +941,7 @@ export const sendRefundNotificationEmail = async (
     const mailOptions = {
       from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_FROM}>`,
       to: teamEmail,
-      subject: `Refund Required - Booking Cancelled - ${villageName} Vaadi Booking`,
+      subject: `રિફંડ જરૂરી - બુકિંગ રદ થયું - ${villageName} વાડી બુકિંગ`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -962,78 +958,76 @@ export const sendRefundNotificationEmail = async (
                   <tr>
                     <td align="center" style="background-color: #f39c12; color: white; padding: 40px 20px;">
                       <div style="font-size: 48px; margin-bottom: 10px;">⚠</div>
-                      <h1 style="margin: 0; font-size: 24px; font-weight: 700;">Refund Required</h1>
-                      <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">${villageName} Vaadi Booking</p>
+                      <h1 style="margin: 0; font-size: 24px; font-weight: 700;">રિફંડ જરૂરી</h1>
+                      <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">${villageName} વાડી બુકિંગ</p>
                     </td>
                   </tr>
                   <!-- Content -->
                   <tr>
                     <td style="background-color: #ffffff; padding: 40px 30px;">
-                      <h2 style="color: #000000; margin-top: 0; margin-bottom: 20px;">Team Notification</h2>
-                      <p style="color: #333333; margin-bottom: 15px; font-weight: 600;">A booking has been cancelled and requires refund processing.</p>
+                      <h2 style="color: #000000; margin-top: 0; margin-bottom: 20px;">ટીમ સૂચના</h2>
+                      <p style="color: #333333; margin-bottom: 15px; font-weight: 600;">એક બુકિંગ રદ કરવામાં આવ્યું છે અને રિફંડ પ્રોસેસિંગની જરૂર છે.</p>
 
                       <!-- Booking Details Box -->
                       <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f5f6f5; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f39c12;">
                         <tr>
                           <td style="padding: 25px;">
-                            <h3 style="margin-top: 0; color: #f39c12; font-size: 18px; margin-bottom: 15px;">Cancelled Booking Details</h3>
+                            <h3 style="margin-top: 0; color: #f39c12; font-size: 18px; margin-bottom: 15px;">રદ થયેલા બુકિંગની વિગતો</h3>
 
                             <!-- Details List -->
                             <table width="100%" cellpadding="0" cellspacing="0" border="0">
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">Villager Name :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">ગ્રામવાસીનું નામ :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${villagerName}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">Email :</span>&nbsp;&nbsp;&nbsp;
-                                  <span style="color: #000000; font-weight: 600;">${email || "Not provided"}</span>
+                                  <span style="color: #666666; font-weight: 500;">ઈમેલ :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${email || "આપવામાં આવ્યું નથી"}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">Mobile Number :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">મોબાઇલ નંબર :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${mobileNumber}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">Hall :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">હોલ :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${hallName}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">Village :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">ગામ :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${villageName}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">Reason :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">કારણ :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${bookingReason}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">From Date :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">તારીખથી :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${formattedFromDate}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0;">
-                                  <span style="color: #666666; font-weight: 500;">To Date :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #666666; font-weight: 500;">તારીખ સુધી :</span>&nbsp;&nbsp;&nbsp;
                                   <span style="color: #000000; font-weight: 600;">${formattedToDate}</span>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="padding: 12px 0;">
-                                  <span style="color: #666666; font-weight: 500;">Total Days :</span>&nbsp;&nbsp;&nbsp;
-                                  <span style="color: #000000; font-weight: 600;">${totalDays} day${
-        totalDays > 1 ? "s" : ""
-      }</span>
+                                  <span style="color: #666666; font-weight: 500;">કુલ દિવસો :</span>&nbsp;&nbsp;&nbsp;
+                                  <span style="color: #000000; font-weight: 600;">${totalDays} દિવસ</span>
                                 </td>
                               </tr>
                             </table>
@@ -1042,7 +1036,7 @@ export const sendRefundNotificationEmail = async (
                             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f39c12; border-radius: 8px; margin-top: 15px;">
                               <tr>
                                 <td align="center" style="padding: 20px;">
-                                  <span style="color: rgba(255,255,255,0.9); font-weight: 500; font-size: 14px;">Refund Amount Required</span>
+                                  <span style="color: rgba(255,255,255,0.9); font-weight: 500; font-size: 14px;">રિફંડ રકમ જરૂરી</span>
                                   <br>
                                   <span style="color: white; font-weight: 700; font-size: 28px; margin-top: 5px; display: inline-block;">${formattedPrice}</span>
                                 </td>
@@ -1052,14 +1046,14 @@ export const sendRefundNotificationEmail = async (
                         </tr>
                       </table>
 
-                      <p style="color: #333333; margin-bottom: 15px; font-weight: 600;">Please process the refund for this cancelled booking at your earliest convenience.</p>
-                      <p style="color: #333333; margin-bottom: 15px;">Contact the customer using the details provided above if needed.</p>
+                      <p style="color: #333333; margin-bottom: 15px; font-weight: 600;">કૃપા કરીને આ રદ થયેલા બુકિંગ માટે જલદીથી રિફંડ પ્રોસેસ કરો.</p>
+                      <p style="color: #333333; margin-bottom: 15px;">જરૂર પડ્યે ઉપર આપેલી વિગતોનો ઉપયોગ કરીને ગ્રાહકનો સંપર્ક કરો.</p>
 
                       <!-- Footer -->
                       <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
                         <tr>
                           <td style="font-size: 13px; color: #a3a4a9;">
-                            <p style="margin: 0;">This is an automated notification from<br><strong>${villageName} Vaadi Booking System</strong></p>
+                            <p style="margin: 0;">આ એક ઓટોમેટિક સૂચના છે<br><strong>${villageName} વાડી બુકિંગ સિસ્ટમ</strong></p>
                           </td>
                         </tr>
                       </table>
@@ -1073,30 +1067,30 @@ export const sendRefundNotificationEmail = async (
         </html>
       `,
       text: `
-        Refund Required - Booking Cancelled
+        રિફંડ જરૂરી - બુકિંગ રદ થયું
 
-        Team Notification
+        ટીમ સૂચના
 
-        A booking has been cancelled and requires refund processing.
+        એક બુકિંગ રદ કરવામાં આવ્યું છે અને રિફંડ પ્રોસેસિંગની જરૂર છે.
 
-        Cancelled Booking Details:
+        રદ થયેલા બુકિંગની વિગતો:
         ---------------------------
-        Villager Name: ${villagerName}
-        Email: ${email || "Not provided"}
-        Mobile Number: ${mobileNumber}
-        Hall: ${hallName}
-        Village: ${villageName}
-        Reason: ${bookingReason}
-        From Date: ${formattedFromDate}
-        To Date: ${formattedToDate}
-        Total Days: ${totalDays} day${totalDays > 1 ? "s" : ""}
-        Refund Amount Required: ${formattedPrice}
+        ગ્રામવાસીનું નામ: ${villagerName}
+        ઈમેલ: ${email || "આપવામાં આવ્યું નથી"}
+        મોબાઇલ નંબર: ${mobileNumber}
+        હોલ: ${hallName}
+        ગામ: ${villageName}
+        કારણ: ${bookingReason}
+        તારીખથી: ${formattedFromDate}
+        તારીખ સુધી: ${formattedToDate}
+        કુલ દિવસો: ${totalDays} દિવસ
+        રિફંડ રકમ જરૂરી: ${formattedPrice}
 
-        Please process the refund for this cancelled booking at your earliest convenience.
+        કૃપા કરીને આ રદ થયેલા બુકિંગ માટે જલદીથી રિફંડ પ્રોસેસ કરો.
 
-        Contact the customer using the details provided above if needed.
+        જરૂર પડ્યે ઉપર આપેલી વિગતોનો ઉપયોગ કરીને ગ્રાહકનો સંપર્ક કરો.
 
-        This is an automated notification from ${villageName} Vaadi Booking System
+        આ એક ઓટોમેટિક સૂચના છે ${villageName} વાડી બુકિંગ સિસ્ટમ
       `,
     };
 
