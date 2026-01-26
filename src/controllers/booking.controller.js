@@ -694,6 +694,133 @@ const getCalendarData = asyncHandler(async (req, res) => {
   );
 });
 
+/**
+ * Public calendar data - no authentication required
+ * Requires villageId parameter
+ */
+const getPublicCalendarData = asyncHandler(async (req, res) => {
+  const { year, month, villageId } = req.query;
+
+  if (!year || !month) {
+    throw new ApiError(400, "Year and month are required");
+  }
+
+  if (!villageId) {
+    throw new ApiError(400, "Village ID is required for public calendar");
+  }
+
+  const yearNum = parseInt(year);
+  const monthNum = parseInt(month);
+
+  if (isNaN(yearNum) || isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
+    throw new ApiError(400, "Invalid year or month");
+  }
+
+  // Validate villageId format
+  if (!villageId.match(/^[0-9a-fA-F]{24}$/)) {
+    throw new ApiError(400, "Invalid village ID");
+  }
+
+  const village = await Village.findById(villageId);
+  if (!village) {
+    throw new ApiError(404, "Village not found");
+  }
+
+  // Get start and end of the month
+  const startDate = new Date(Date.UTC(yearNum, monthNum - 1, 1, 0, 0, 0, 0));
+  const endDate = new Date(Date.UTC(yearNum, monthNum, 0, 23, 59, 59, 999));
+
+  // Get halls for the village
+  const hallQuery = {
+    status: "Active",
+    villageName: village.name,
+  };
+
+  const halls = await Hall.find(hallQuery)
+    .select("_id name color villageName")
+    .sort({ name: 1 });
+
+  // Assign colors to halls without colors
+  const usedColors = halls.map((h) => h.color).filter(Boolean);
+  const hallsToUpdate = [];
+  const hallColorMap = {};
+
+  for (const hall of halls) {
+    if (!hall.color) {
+      let assignedColor = null;
+      for (const color of CALENDAR_HALL_COLORS) {
+        if (!usedColors.includes(color)) {
+          assignedColor = color;
+          usedColors.push(color);
+          break;
+        }
+      }
+      if (!assignedColor) {
+        assignedColor =
+          "#" +
+          Math.floor(Math.random() * 16777215)
+            .toString(16)
+            .padStart(6, "0");
+      }
+      hall.color = assignedColor;
+      hallsToUpdate.push({ id: hall._id, color: assignedColor });
+    }
+    hallColorMap[hall._id.toString()] = hall.color;
+  }
+
+  // Save updated colors to database
+  if (hallsToUpdate.length > 0) {
+    await Promise.all(
+      hallsToUpdate.map((h) => Hall.findByIdAndUpdate(h.id, { color: h.color }))
+    );
+  }
+
+  // Get bookings for the village
+  const bookingQuery = {
+    isCancelled: { $ne: true },
+    fromDate: { $lte: endDate },
+    toDate: { $gte: startDate },
+    villageName: village.name,
+  };
+
+  const bookings = await Booking.find(bookingQuery)
+    .populate("hallId", "name color")
+    .sort({ fromDate: 1 });
+
+  // Format bookings for calendar (only show basic info for public)
+  const calendarBookings = bookings.map((booking) => {
+    const hallId =
+      booking.hallId?._id?.toString() || booking.hallId?.toString();
+    return {
+      _id: booking._id,
+      hallId: booking.hallId?._id || booking.hallId,
+      hallName: booking.hallId?.name || booking.hallName,
+      hallColor: hallColorMap[hallId] || booking.hallId?.color || "#9747ff",
+      bookingReason: booking.bookingReason,
+      fromDate: booking.fromDate,
+      toDate: booking.toDate,
+      totalDays: booking.totalDays,
+      // Note: Not exposing villagerName and mobileNumber for privacy
+    };
+  });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        bookings: calendarBookings,
+        halls: halls.map((h) => ({
+          _id: h._id,
+          name: h.name,
+          color: h.color,
+        })),
+        villageName: village.name,
+      },
+      "Public calendar data fetched successfully"
+    )
+  );
+});
+
 export {
   getAllBookings,
   getBookingById,
@@ -702,4 +829,5 @@ export {
   cancelBooking,
   getAvailableHalls,
   getCalendarData,
+  getPublicCalendarData,
 };

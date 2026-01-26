@@ -7,12 +7,16 @@ import {
   cancelBooking,
   getAvailableHalls,
   getCalendarData,
+  getPublicCalendarData,
 } from "../controllers/booking.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-// All routes require authentication
+// Public route - no auth required (for villagers to check availability)
+router.route("/public/calendar").get(getPublicCalendarData);
+
+// All routes below require authentication
 router.use(verifyJWT);
 
 // Get available halls for booking dropdown
